@@ -1,0 +1,50 @@
+
+hosts:
+     10.84.7.206:
+        ansible_user:
+        ansible_ssh_pass:
+
+interfaces:
+    10.84.7.206:
+        control:
+            mac_address :
+            ip-address :
+
+roles:
+    10.84.7.206:
+        configdb:
+        config:
+        control:
+        webui:
+        analytics:
+        analyticsdb:
+        vrouter:
+        tsn:
+        k8smaster:
+        esxi:
+        tor-agent:
+
+contrail_configs:
+    config_aaa_mode:
+    analytics_aaa_mode:
+    internal_vip:
+    external_vip:
+
+orchestrator_configs:
+    keystone:
+        version:
+        username:
+        password:
+        project:
+        ssl:
+            certs:
+            region_name:
+    internal_vip:
+    external_vip:
+
+test_configs:
+    image_web_server:
+    mail_server:
+    report_path:
+    log_path:
+    keystonev3_use_project_scope:

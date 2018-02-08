@@ -1,0 +1,66 @@
+
+- name: install epel
+  yum:
+    name: epel-release
+    state: latest
+
+- name: install ntpd
+  yum:
+    name: ntp
+    state: latest
+
+- name: set ntp server
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+
+- name: initial time sync
+  shell: "ntpdate {{ network.ntpserver }}"
+  ignore_errors: yes
+
+- name: start ntp service
+  service: name=ntpd state=started enabled=yes
+
+- name: install pip
+  yum:
+    name: python-pip
+    state: latest
+
+- name: create docker repo
+  yum_repository:
+    name: dockerrepo
+    description: Docker Repository
+    baseurl: https://yum.dockerproject.org/repo/main/centos/7
+    gpgkey: https://yum.dockerproject.org/gpg
+    gpgcheck: yes
+
+- name: install docker selinux
+  yum:
+    name: docker-engine-selinux-1.12.6
+    state: installed
+
+- name: install docker
+  yum:
+    name: docker-engine-1.12.6
+    state: installed
+
+- name: start docker daemon
+  service:
+    enabled: yes
+    name: docker
+    state: started
+
+- name: get docker compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.17.0/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0777
+
+- name: install python compose
+  pip:
+    name: docker-compose==1.9.0
+
+
+
+
+

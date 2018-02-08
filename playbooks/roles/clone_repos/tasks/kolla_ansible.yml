@@ -1,0 +1,16 @@
+
+- name: clone kolla ansible repo for openstack
+  git:
+    repo: 'https://github.com/Juniper/contrail-kolla-ansible.git'
+    dest: /contrail-kolla-ansible
+    version: master
+    update: yes
+
+- name: clone ansible deployer repo for contrail
+  git:
+    repo: 'https://github.com/Juniper/contrail-ansible-deployer.git'
+    dest: /contrail-ansible-deployer
+    version: master
+    update: yes
+
+

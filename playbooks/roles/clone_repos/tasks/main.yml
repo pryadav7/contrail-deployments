@@ -1,0 +1,4 @@
+- name: clone repos for kolla ansible
+  import_tasks: kolla_ansible.yml
+  when: deployment_type is defined and deployment_type == "CAD"
+

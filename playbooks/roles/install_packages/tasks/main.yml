@@ -1,0 +1,4 @@
+---
+- name: install software for ansible deployer
+  import_tasks: kolla_ansible.yml
+  when: deployment_type is defined and deployment_type == "CAD"

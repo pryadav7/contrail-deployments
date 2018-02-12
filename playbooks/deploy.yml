@@ -4,3 +4,4 @@
   - install_packages
   - clone_repos
   - update_yamls
+  - provision

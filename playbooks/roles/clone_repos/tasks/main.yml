@@ -1,4 +1,5 @@
-- name: clone repos for kolla ansible
-  import_tasks: kolla_ansible.yml
-  when: deployment_type is defined and deployment_type == "CAD"
+---
 
+- name: clone repos for kolla and contrail ansible deployer
+  import_tasks: kolla_contrail_ansible.yml
+  when: deployment_type is defined and deployment_type == "kolla_contrail"

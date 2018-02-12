@@ -1,7 +1,0 @@
-- name: update passwords for the hosts (password.yml)
-
-- name: update main configuration file (globals.yml)
-
-- name: update top level wrapper for all playbooks (all.yml)
-
-- name: update inventory

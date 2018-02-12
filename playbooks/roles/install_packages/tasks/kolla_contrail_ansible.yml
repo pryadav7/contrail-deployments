@@ -1,25 +1,27 @@
-
 - name: install epel
   yum:
     name: epel-release
     state: latest
 
-- name: install ntpd
+- name: Remove python-jinja2
   yum:
-    name: ntp
+    name: python-jinja2
+    state: absent
+
+- name: install centos-release-openstack-ocata
+  yum:
+    name: centos-release-openstack-ocata
+    state: installed
+
+- name: install ansible 2.3
+  yum:
+    name: ansible-2.3.1.0
+    state: installed
+
+- name: install python-oslo-config
+  yum:
+    name: python-oslo-config
     state: latest
-
-- name: set ntp server
-  template:
-    src: ntp.conf.j2
-    dest: /etc/ntp.conf
-
-- name: initial time sync
-  shell: "ntpdate {{ network.ntpserver }}"
-  ignore_errors: yes
-
-- name: start ntp service
-  service: name=ntpd state=started enabled=yes
 
 - name: install pip
   yum:
@@ -60,7 +62,12 @@
   pip:
     name: docker-compose==1.9.0
 
+- name: install git
+  yum:
+    name: git
+    state: installed
 
-
-
-
+- name: Load ip_vs module
+  modprobe:
+    name: ip_vs
+    state: present

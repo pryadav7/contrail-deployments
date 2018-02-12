@@ -3,8 +3,8 @@
   git:
     repo: 'https://github.com/Juniper/contrail-kolla-ansible.git'
     dest: /contrail-kolla-ansible
-    version: master
-    update: yes
+    version: contrail/ocata
+
 
 - name: clone ansible deployer repo for contrail
   git:
@@ -12,5 +12,4 @@
     dest: /contrail-ansible-deployer
     version: master
     update: yes
-
 

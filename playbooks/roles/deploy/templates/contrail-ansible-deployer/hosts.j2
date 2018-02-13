@@ -1,0 +1,7 @@
+container_hosts:
+  hosts:
+  {% for host, values in container_hosts.hosts.iteritems() %}
+  {{ host }}:
+      ansible_ssh_pass: {{ values.ansible_ssh_pass | default('c0ntrail123') }}
+      ansible_ssh_user: {{ values.ansible_ssh_user | default('root') }}
+  {% endfor %}

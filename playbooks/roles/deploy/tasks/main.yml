@@ -1,0 +1,32 @@
+---
+- name: copy deployment to temp variable
+  set_fact:
+     tmp_deployment: "{{ deployment }}"
+  when: deployment is defined
+
+- name: set default deployment
+  vars:
+    types:
+      kolla:
+      contrail:
+  set_fact:
+    deployment: "{{ deployment|default({})|combine({'type': types }) }}"
+  when: deployment is undefined or deployment.type is undefined
+
+- name: set default openstack version
+  set_fact:
+    sku: 'ocata'
+  when: deployment.type.kolla is defined and deployment.sku is undefined
+
+- name: set openstack version
+  set_fact:
+    sku: "{{ deployment.sku }}"
+  when: deployment.sku is defined
+
+- name: clone kolla ansible deployer
+  import_tasks: contrail-kolla-ansible/main.yml
+  when: deployment.type.kolla is defined
+
+- name: clone contrail ansible deployer
+  import_tasks: contrail-ansible-deployer/main.yml
+  when: deployment.type.contrail is defined

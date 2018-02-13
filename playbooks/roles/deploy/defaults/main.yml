@@ -1,0 +1,6 @@
+os: centos7
+contrailregistry: opencontrailnightly
+version: latest
+orchestrator: openstack
+admin_password: c0ntrail123
+mysql_password: c0ntrail123

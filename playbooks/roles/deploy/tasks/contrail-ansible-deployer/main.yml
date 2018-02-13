@@ -1,0 +1,43 @@
+---
+- name: set contrail ansible repo version if undefined
+  set_fact:
+    contrail_branch: master
+  when: deployment.type.contrail.branch is undefined
+
+- name: set contrail ansible repo version if defined
+  set_fact:
+    contrail_branch: "{{ deployment.type.contrail.branch }}"
+  when: deployment.type.contrail.branch is defined
+
+- name: create temp directory for contrail
+  tempfile:
+     state: directory
+     suffix: _contrail
+  register: tmpdir
+
+- debug:
+    msg: "Cloning contrail-ansible-deployer at {{ tmpdir.path }}"
+
+- name: clone contrail ansible repo for openstack
+  git:
+    repo: 'https://github.com/Juniper/contrail-ansible-deployer.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "{{ tmpdir.path }}"
+    version: "{{ contrail_branch }}"
+
+- name: update hosts file
+  template:
+    src: contrail-ansible-deployer/hosts.j2
+    dest: "{{ tmpdir.path }}/inventory/hosts"
+
+#- name: update contrail inventory file
+#  template:
+#    src: contrail-ansible-deployer/all.yml.j2
+#    dest: "{{ tmpdir.path }}/inventory/group_vars/all.yml"
+
+- name: update container hosts
+  template:
+    src: contrail-ansible-deployer/container_hosts.yml.j2
+    dest: "{{ tmpdir.path }}/inventory/group_vars/container_hosts.yml"
+  with_items: "{{ roles }}"

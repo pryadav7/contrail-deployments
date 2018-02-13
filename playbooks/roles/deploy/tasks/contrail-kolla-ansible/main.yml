@@ -1,0 +1,44 @@
+---
+- name: set kolla ansible repo version if undefined
+  set_fact:
+    kolla_branch: "{{ 'contrail/ocata' if (sku == 'ocata') else 'contrail/pike' }}"
+  when: deployment.type.kolla.branch is undefined
+
+- name: set kolla ansible repo version if defined
+  set_fact:
+    kolla_branch: "{{ deployment.type.kolla.branch }}"
+  when: deployment.type.kolla.branch is defined
+
+- name: create temp directory for kolla
+  tempfile:
+     state: directory
+     suffix: _kolla
+  register: tmpdir
+
+- name: clone kolla ansible repo for openstack
+  git:
+    repo: 'https://github.com/Juniper/contrail-kolla-ansible.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "{{ tmpdir.path }}"
+    version: "{{ kolla_branch }}"
+
+- name: update passwords for the hosts (passwords.yml)
+  template:
+    src: password.yml.j2
+    dest: "{{ tmpdir.path }} + /etc/kolla/passwords.yml"
+
+- name: update main configuration file (globals.yml)
+  template:
+    src: globals.yml.j2
+    dest: "{{ tmpdir.path }} + /etc/kolla/globals.yml"
+
+- name: update top level wrapper for all playbooks (all.yml)
+  template:
+      src: all.yml.j2
+      dest: "{{ tmpdir.path }} + /ansible/all.yml"
+
+- name: update all-in one inventory for kolla deployment
+  template:
+    src: all-in-one.j2
+    dest: "{{ tmpdir.path }} + /ansible/inventory/all-in-one"

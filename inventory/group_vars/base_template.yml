@@ -34,7 +34,7 @@ orchestrator_configs:
     keystone:
         version:
         username:
-        password:
+        password: c0ntrail123
         project:
         ssl:
             certs:

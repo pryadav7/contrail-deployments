@@ -16,16 +16,12 @@ contrail_configuration:
   PHYSICAL_INTERFACE: bond0                                                              
   VROUTER_GATEWAY: 192.168.7.1
 
-roles:
-  {{ container_hosts.hosts.keys()[0] }}:
-      configdb:
-      config:
-      control:
-      webui:
-      analytics:
-      analyticsdb:
-      vrouter:
-      tsn:
-      k8smaster:
-      esxi:
-      tor-agent:
+roles: 
+{% for key , value in contrail_configs['roles'].iteritems() %}
+  {{ key }}:
+    {% for item in value %}                                                                                          
+    {{ item }}:
+    {% endfor %}
+{% endfor %}
+
+

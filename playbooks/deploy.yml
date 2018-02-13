@@ -1,7 +1,7 @@
 - hosts:
   - container_hosts
   roles:
-  - install_packages
-  - clone_repos
+#  - install_packages
+#  - clone_repos
   - update_yamls
-  - provision
+#  - provision

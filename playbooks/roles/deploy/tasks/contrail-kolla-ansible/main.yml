@@ -15,6 +15,9 @@
      suffix: _kolla
   register: tmpdir
 
+- debug:
+    msg: "Cloning contrail-kolla-ansible at {{ tmpdir.path }}"
+
 - name: clone kolla ansible repo for openstack
   git:
     repo: 'https://github.com/Juniper/contrail-kolla-ansible.git'
@@ -23,22 +26,43 @@
     dest: "{{ tmpdir.path }}"
     version: "{{ kolla_branch }}"
 
-- name: update passwords for the hosts (passwords.yml)
-  template:
-    src: password.yml.j2
-    dest: "{{ tmpdir.path }} + /etc/kolla/passwords.yml"
+- name: set orchestrator configs if not defined
+  set_fact:
+    orchestrator_configs: "{{ orchestrator_configs|default({})|combine({'keystone': {}}) }}"
+  when: orchestrator_configs is undefined or orchestrator_configs.keystone is undefined
 
-- name: update main configuration file (globals.yml)
-  template:
-    src: globals.yml.j2
-    dest: "{{ tmpdir.path }} + /etc/kolla/globals.yml"
+- name: set auth ip if roles undefined
+  set_fact:
+     auth_ip: "{{ groups['container_hosts'][0] }}"
+  when: orchestrator_configs.keystone.internal_vip is undefined and roles is undefined
 
-- name: update top level wrapper for all playbooks (all.yml)
-  template:
-      src: all.yml.j2
-      dest: "{{ tmpdir.path }} + /ansible/all.yml"
+- name: set auth ip if roles defined
+  set_fact:
+      auth_ip: "{{ item.key }}"
+  when: item.value.openstack is defined and auth_ip is undefined
+  with_dict: "{{ roles }}"
 
-- name: update all-in one inventory for kolla deployment
-  template:
-    src: all-in-one.j2
-    dest: "{{ tmpdir.path }} + /ansible/inventory/all-in-one"
+- name: set auth ip if defined
+  set_fact:
+     auth_ip: orchestrator_configs.keystone.internal_vip
+  when: orchestrator_configs.keystone.internal_vip is defined
+
+#- name: update passwords for the hosts (passwords.yml)
+#  template:
+#    src: password.yml.j2
+#    dest: "{{ tmpdir.path }}/etc/kolla/passwords.yml"
+
+#- name: update main configuration file (globals.yml)
+#  template:
+#    src: globals.yml.j2
+#    dest: "{{ tmpdir.path }}/etc/kolla/globals.yml"
+
+#- name: update top level wrapper for all playbooks (all.yml)
+#  template:
+#      src: all.yml.j2
+#      dest: "{{ tmpdir.path }}/ansible/all.yml"
+
+#- name: update all-in one inventory for kolla deployment
+#  template:
+#    src: all-in-one.j2
+#    dest: "{{ tmpdir.path }}/ansible/inventory/all-in-one"

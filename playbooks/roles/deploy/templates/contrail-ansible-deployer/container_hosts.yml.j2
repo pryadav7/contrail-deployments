@@ -2,21 +2,23 @@ CONTAINER_REGISTRY: {{ contrailregistry }}
 REGISTRY_PRIVATE_SECURE: false
 REGISTRY_PRIVATE_INSECURE: false
 contrail_configuration:
-  LINUX_DISTR: {{ os }}
+  LINUX_DISTR: {{ 'centos7' if 'centos' in os else 'ubuntu16' }}
   OPENSTACK_VERSION: {{ sku }}
   CONTRAIL_VERSION: {{ version }}
-  CONTROLLER_NODES: 192.16.7.13,192.16.7.14,192.16.7.15
+{% for key, value in contrail_configs.iteritems() %}
+  {{ key }}: {{ value }}
+{% endfor %}
 {% if orchestrator == 'openstack' %}
   AUTH_MODE: keystone
   KEYSTONE_AUTH_ADMIN_PASSWORD: {{ admin_password }}
-  KEYSTONE_AUTH_HOST: "{{ ansible_all_ipv4_addresses[0] }}"
-  RABBITMQ_PORT: 5673
+  KEYSTONE_AUTH_HOST: "{{ auth_ip }}"
+  RABBITMQ_PORT: "{{ contrail_rabbitmq_port }}"
 {% endif %}
   PHYSICAL_INTERFACE: bond0
   VROUTER_GATEWAY: 192.168.7.1
 
 {% if roles is defined %}
-roles: 
+roles:
 {% for key , value in roles.iteritems() %}
   {{ key }}:
     {% for item in value %} {{ item }}:

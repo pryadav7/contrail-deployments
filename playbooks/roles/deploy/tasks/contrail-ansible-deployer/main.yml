@@ -26,6 +26,11 @@
     dest: "{{ tmpdir.path }}"
     version: "{{ contrail_branch }}"
 
+- name: set contrailregistry if defined
+  set_fact:
+    contrailregistry: "{{ deployment.type.contrail.registry }}"
+  when: deployment.type.contrail.registry is defined
+
 - name: update hosts file
   template:
     src: contrail-ansible-deployer/hosts.j2
@@ -40,4 +45,3 @@
   template:
     src: contrail-ansible-deployer/container_hosts.yml.j2
     dest: "{{ tmpdir.path }}/inventory/group_vars/container_hosts.yml"
-  with_items: "{{ roles }}"

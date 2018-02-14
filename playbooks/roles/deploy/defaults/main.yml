@@ -1,6 +1,8 @@
 os: centos7
-contrailregistry: opencontrailnightly
+sku: ocata
 version: latest
+contrailregistry: opencontrailnightly
 orchestrator: openstack
 admin_password: c0ntrail123
 mysql_password: c0ntrail123
+contrail_rabbitmq_port: 5673

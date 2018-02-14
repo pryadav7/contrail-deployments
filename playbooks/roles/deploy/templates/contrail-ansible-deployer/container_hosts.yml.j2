@@ -19,9 +19,8 @@ contrail_configuration:
 
 {% if roles is defined %}
 roles:
-{% for key , value in roles.iteritems() %}
-  {{ key }}:
-    {% for item in value %} {{ item }}:
-    {% endfor %}
+{% for key, value in roles.iteritems() %}  {{ key }}:
+{% for item in value %}    {{ item }}:
+{% endfor %}
 {% endfor %}
 {% endif %}

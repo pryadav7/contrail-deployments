@@ -34,7 +34,7 @@
 - name: set auth ip if roles undefined
   set_fact:
      auth_ip: "{{ groups['container_hosts'][0] }}"
-  when: orchestrator_configs.keystone.internal_vip is undefined and roles is undefined
+  when: orchestrator_configs.internal_vip is undefined and roles is undefined
 
 - name: set auth ip if roles defined
   set_fact:
@@ -44,25 +44,31 @@
 
 - name: set auth ip if defined
   set_fact:
-     auth_ip: orchestrator_configs.keystone.internal_vip
-  when: orchestrator_configs.keystone.internal_vip is defined
+     auth_ip: "{{ orchestrator_configs.internal_vip }}"
+  when: orchestrator_configs.internal_vip is defined
 
-#- name: update passwords for the hosts (passwords.yml)
-#  template:
-#    src: password.yml.j2
-#    dest: "{{ tmpdir.path }}/etc/kolla/passwords.yml"
+- name: set kolla ansible external_vip_address if defined
+  set_fact:
+    kolla_external_vip: "{{ orchestrator_configs.external_vip }}"
+  when:  orchestrator_configs.external_vip is defined
 
-#- name: update main configuration file (globals.yml)
-#  template:
-#    src: globals.yml.j2
-#    dest: "{{ tmpdir.path }}/etc/kolla/globals.yml"
+- name: update passwords for the hosts (passwords.yml)
+  template:
+    src: contrail-kolla-ansible/password.yml.j2
+    dest: "{{ tmpdir.path }}/etc/kolla/passwords.yml"
 
-#- name: update top level wrapper for all playbooks (all.yml)
-#  template:
-#      src: all.yml.j2
-#      dest: "{{ tmpdir.path }}/ansible/all.yml"
+- name: update main configuration file (globals.yml)
+  template:
+    src: contrail-kolla-ansible/globals.yml.j2
+    dest: "{{ tmpdir.path }}/etc/kolla/globals.yml"
 
-#- name: update all-in one inventory for kolla deployment
-#  template:
-#    src: all-in-one.j2
-#    dest: "{{ tmpdir.path }}/ansible/inventory/all-in-one"
+- name: update top level wrapper for all playbooks (all.yml)
+  template:
+      src: contrail-kolla-ansible/all.yml.j2
+      dest: "{{ tmpdir.path }}/ansible/all.yml"
+
+- name: update all-in one inventory for kolla deployment
+  template:
+    src: contrail-kolla-ansible/all-in-one.j2
+    dest: "{{ tmpdir.path }}/ansible/inventory/all-in-one"
+

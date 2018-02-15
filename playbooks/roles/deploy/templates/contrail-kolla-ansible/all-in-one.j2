@@ -1,19 +1,43 @@
 # These initial groups are the only groups required to be modified. The
 # additional groups are for more control of the environment.
 [control]
-{{ container_hosts.hosts.keys()[0] }}       ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
+{% if roles is defined %}
+{% for key , value in roles.iteritems() %}
+{% for item in value if item == "openstack" %}
+{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
+{% endfor %}
+{% endfor %}
+{% endif %}
 
 [network]
-{{ container_hosts.hosts.keys()[0] }}       ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
+{% if roles is defined %}
+{% for key , value in roles.iteritems() %}
+{% for item in value if item == "openstack" %}
+{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
+{% endfor %}
+{% endfor %}
+{% endif %}
 
 [compute]
-{{ container_hosts.hosts.keys()[0] }}       ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
+{% if roles is defined %}
+{% for key , value in roles.iteritems() %}
+{% for item in value if item == "vrouter" %}
+{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
+{% endfor %}
+{% endfor %}
+{% endif %}
 
 [storage]
 
 
 [monitoring]
-
+{% if roles is defined %}
+{% for key , value in roles.iteritems() %}
+{% for item in value if item == "vrouter" %}
+{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
+{% endfor %}
+{% endfor %}
+{% endif %}
 
 [deployment]
 

@@ -1,6 +1,0 @@
----
-
-- name: update yamls for kolla ansible deployer
-  import_tasks: kolla_contrail_ansible.yml
-  when: deployment_type is defined and deployment_type == "kolla_contrail"
-

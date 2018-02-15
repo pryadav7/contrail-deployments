@@ -2,28 +2,31 @@
 # additional groups are for more control of the environment.
 [control]
 {% if roles is defined %}
-{% for key , value in roles.iteritems() %}
-{% for item in value if item == "openstack" %}
-{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
-{% endfor %}
+{% for key, value in roles.iteritems() %}
+{% if "openstack" in value.keys() %}
+{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
+
+{% endif %}
 {% endfor %}
 {% endif %}
 
 [network]
 {% if roles is defined %}
-{% for key , value in roles.iteritems() %}
-{% for item in value if item == "openstack" %}
-{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
-{% endfor %}
+{% for key, value in roles.iteritems() %}
+{% if "openstack" in value.keys() %}
+{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
+
+{% endif %}
 {% endfor %}
 {% endif %}
 
 [compute]
 {% if roles is defined %}
-{% for key , value in roles.iteritems() %}
-{% for item in value if item == "vrouter" %}
-{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
-{% endfor %}
+{% for key, value in roles.iteritems() %}
+{% if "vrouter" in value.keys() %}
+{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
+
+{% endif %}
 {% endfor %}
 {% endif %}
 
@@ -32,15 +35,15 @@
 
 [monitoring]
 {% if roles is defined %}
-{% for key , value in roles.iteritems() %}
-{% for item in value if item == "vrouter" %}
-{{ key }} ansible_connection=ssh  ansible_ssh_pass=c0ntrail123
-{% endfor %}
+{% for key, value in roles.iteritems() %}
+{% if "openstack" in value.keys() %}
+{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
+
+{% endif %}
 {% endfor %}
 {% endif %}
 
 [deployment]
-
 
 # You can explicitly specify which hosts run each project by updating the
 # groups in the sections below. Common services are grouped together.

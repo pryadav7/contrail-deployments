@@ -14,8 +14,6 @@ contrail_configuration:
   KEYSTONE_AUTH_HOST: "{{ auth_ip }}"
   RABBITMQ_PORT: "{{ contrail_rabbitmq_port }}"
 {% endif %}
-  PHYSICAL_INTERFACE: bond0
-  VROUTER_GATEWAY: 192.168.7.1
 
 {% if roles is defined %}
 roles:

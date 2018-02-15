@@ -1,0 +1,20 @@
+- hosts: localhost
+  strategy: debug
+  tasks:
+    - add_host:
+        name: "{{ item.key }}"
+        ansible_ssh_host: "{{ item.key }}"
+        ansible_ssh_user: "{{ item.value.ansible_user | default('root') }}"
+        ansible_ssh_pass: "{{ item.value.ansible_ssh_pass | default('c0ntrail123') }}"
+        group: "container_hosts"
+      with_dict: "{{ container_hosts.hosts }}"
+
+- hosts: container_hosts
+  strategy: debug
+  become: true
+  become_user: root
+  roles:
+  - install_packages
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: 'false'
+    ANSIBLE_STDOUT_CALLBACK: debug

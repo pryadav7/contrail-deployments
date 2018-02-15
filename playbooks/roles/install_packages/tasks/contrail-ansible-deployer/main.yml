@@ -3,11 +3,6 @@
     name: epel-release
     state: latest
 
-- name: Remove python-jinja2
-  yum:
-    name: python-jinja2
-    state: absent
-
 - name: install centos-release-openstack-ocata
   yum:
     name: centos-release-openstack-ocata
@@ -17,11 +12,6 @@
   yum:
     name: ansible-2.3.1.0
     state: installed
-
-- name: install python-oslo-config
-  yum:
-    name: python-oslo-config
-    state: latest
 
 - name: install pip
   yum:

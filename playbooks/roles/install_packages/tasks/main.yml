@@ -1,6 +1,27 @@
 ---
+- name: copy deployment to temp variable
+  set_fact:
+     tmp_deployment: "{{ deployment }}"
+  when: deployment is defined
 
-- name: install software for kolla and contrail ansible deployer
-  import_tasks: kolla_contrail_ansible.yml
-  when: deployment_type is defined and deployment_type == "kolla_contrail"
+- name: set default deployment
+  vars:
+    types:
+      kolla:
+      contrail:
+  set_fact:
+    deployment: "{{ deployment|default({})|combine({'type': types }) }}"
+  when: deployment is undefined or deployment.type is undefined
 
+- name: install packages for kolla ansible deployer
+  import_tasks: contrail-kolla-ansible/main.yml
+  when: deployment.type.kolla is defined
+  delegate_to: "{{ container_hosts.hosts.keys()[0] }}"
+  environment: 
+     ansible_ssh_user: root
+     ansible_ssh_pass: c0ntrail123
+     ansible_host_key_cheking: 'false'
+
+- name: install packages for contrail ansible deployer
+  import_tasks: contrail-ansible-deployer/main.yml
+  when: deployment.type.contrail is defined

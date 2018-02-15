@@ -1,8 +1,4 @@
 - hosts: localhost
-  gather_facts: yes
   strategy: debug
   roles:
-#  - install_packages
   - deploy
-#  - update_yamls
-#  - provision

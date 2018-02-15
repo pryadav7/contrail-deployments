@@ -1,16 +1,14 @@
-- name: get hostname
-  command: hostname
-  register: hostname
-
 - name: install epel
   yum:
     name: epel-release
     state: latest
+  delegate_to: localhost
 
 - name: install centos-release-openstack-ocata
   yum:
     name: centos-release-openstack-ocata
     state: installed
+  delegate_to: localhost
 
 - name: install ansible 2.3
   yum:
@@ -23,3 +21,36 @@
     name: python-oslo-config
     state: latest
   delegate_to: localhost
+
+- name: install pip
+  yum:
+    name: python-pip
+    state: latest
+  delegate_to: localhost
+
+- name: install git
+  yum:
+    name: git
+    state: installed
+  delegate_to: localhost
+
+- name: pip install jinja2
+  yum:
+    name: python2-jinja2
+    state: installed
+  delegate_to: localhost
+
+- name: install epel
+  yum:
+    name: epel-release
+    state: latest
+
+- name: install centos-release-openstack-ocata
+  yum:
+    name: centos-release-openstack-ocata
+    state: installed
+
+- name: Load ip_vs module
+  modprobe:
+    name: ip_vs
+    state: present

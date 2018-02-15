@@ -56,8 +56,3 @@
   yum:
     name: git
     state: installed
-
-- name: Load ip_vs module
-  modprobe:
-    name: ip_vs
-    state: present

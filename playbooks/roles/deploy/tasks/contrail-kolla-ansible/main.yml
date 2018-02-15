@@ -26,6 +26,10 @@
     dest: "{{ tmpdir.path }}"
     version: "{{ kolla_branch }}"
 
+- name: set kolla provision dir
+  set_fact:
+      kolla_provision_dir: "{{ tmpdir.path }}"
+
 - name: set orchestrator configs if not defined
   set_fact:
     orchestrator_configs: "{{ orchestrator_configs|default({})|combine({'keystone': {}}) }}"

@@ -26,6 +26,10 @@
     dest: "{{ tmpdir.path }}"
     version: "{{ contrail_branch }}"
 
+- name: set contrail provision dir
+  set_fact:
+      contrail_provision_dir: "{{ tmpdir.path }}"
+
 - name: set contrailregistry if defined
   set_fact:
     contrailregistry: "{{ deployment.type.contrail.registry }}"

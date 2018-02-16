@@ -61,11 +61,11 @@
 #  when: default_roles_hosts is defined
 
 - name: clone kolla ansible deployer
-  import_tasks: contrail-kolla-ansible/main.yml
+  include: contrail-kolla-ansible/main.yml
   when: deployment.type.kolla is defined
 
 - name: clone contrail ansible deployer
-  import_tasks: contrail-ansible-deployer/main.yml
+  include: contrail-ansible-deployer/main.yml
   when: deployment.type.contrail is defined
 
 - name: Provision OpenStack cluster with kolla

@@ -1,3 +1,4 @@
+
 deployment:
     type:
         kolla:
@@ -15,35 +16,73 @@ network:
 
 container_hosts:
     hosts:
-        10.84.7.199:
+        10.0.0.4:
             ansible_user: root
             ansible_ssh_pass: c0ntrail123
-            network_interface: eth0
+            network_interface: eth1
             kolla_external_vip_interface: eth0
-        10.87.118.138:
+        10.0.0.5:
             ansible_user: root
             ansible_ssh_pass: c0ntrail123
-            network_interface: eth0
+            network_interface: eth1
+            kolla_external_vip_interface: eth0
+        10.0.0.6:
+            ansible_user: root
+            ansible_ssh_pass: c0ntrail123
+            network_interface: eth1
+            kolla_external_vip_interface: eth0
+        10.0.0.7:
+            ansible_user: root
+            ansible_ssh_pass: c0ntrail123
+            network_interface: eth1
+            kolla_external_vip_interface: eth0
+        10.0.0.10:
+            ansible_user: root
+            ansible_ssh_pass: c0ntrail123
+            network_interface: eth1
             kolla_external_vip_interface: eth0
 
 roles:
-    10.84.7.199:
-        vrouter:
-    10.87.118.138:
-        configdb:
+    10.0.0.5:
+        config_database:
         config:
         control:
         webui:
         analytics:
-        analyticsdb:
-        tsn:
-        esxi:
-        tor-agent:
-        k8smaster:
+        analytics_database:
         openstack:
+
+    10.0.0.6:
+        config_database:
+        config:
+        control:
+        webui:
+        analytics:
+        analytics_database:
+        openstack:
+
+    10.0.0.10:
+        config_database:
+        config:
+        control:
+        webui:
+        analytics:
+        analytics_database:
+        openstack:
+
+    10.0.0.4:
+        vrouter:
+
+    10.0.0.7:
+        vrouter:
 
 contrail_configs:
     AAA_MODE: rbac
+    METADATA_PROXY_SECRET: c0ntrail123
+    CONFIG_NODES: 10.10.0.3,10.10.0.5,10.10.0.10
+    ANALYTICS_NODES: 10.10.0.3,10.10.0.5,10.10.0.10
+    PHYSICAL_INTERFACE: eth1
+    VROUTER_GATEWAY: 10.10.0.1 
 
 orchestrator_configs:
     keystone:
@@ -51,9 +90,12 @@ orchestrator_configs:
         username:
         password: c0ntrail123
         project:
+        region_name:
         ssl:
             certs:
-            region_name:
+    internal_vip: 10.10.0.200
+    external_vip: 10.0.0.200
+    network_interface: eth1
 
 test_configs:
     image_web_server:

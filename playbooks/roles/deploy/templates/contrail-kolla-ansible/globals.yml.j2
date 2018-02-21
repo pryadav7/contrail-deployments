@@ -18,7 +18,7 @@ kolla_base_distro: "{{ 'ubuntu' if 'ubuntu' in os else 'centos' }}"
 kolla_install_type: "binary"
 
 # Valid option is Docker repository tag
-openstack_release: "{{ sku }}"
+openstack_release: "{{ '4.0.0' if 'ocata' in sku else sku }}"
 
 # Location of configuration overrides
 #node_custom_config: "/etc/kolla/config"

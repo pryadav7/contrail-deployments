@@ -84,6 +84,11 @@
     kolla_registry: "{{ deployment.type.kolla.registry }}"
   when: deployment.type.kolla.registry is defined
 
+- name: set network_interface if defined
+  set_fact:
+    network_interface: "{{ orchestrator_configs.network_interface }}"
+  when: orchestrator_configs.network_interface is defined
+
 - debug:
     msg: "Cloning contrail-kolla-ansible at {{ tmpdir.path }}"
 

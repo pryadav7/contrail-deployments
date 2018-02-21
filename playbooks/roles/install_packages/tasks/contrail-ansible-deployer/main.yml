@@ -52,7 +52,3 @@
   pip:
     name: docker-compose==1.9.0
 
-- name: install git
-  yum:
-    name: git
-    state: installed

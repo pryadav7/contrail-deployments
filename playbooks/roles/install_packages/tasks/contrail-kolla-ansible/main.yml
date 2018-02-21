@@ -28,12 +28,6 @@
     state: latest
   delegate_to: localhost
 
-- name: install git
-  yum:
-    name: git
-    state: installed
-  delegate_to: localhost
-
 - name: pip install jinja2
   yum:
     name: python2-jinja2

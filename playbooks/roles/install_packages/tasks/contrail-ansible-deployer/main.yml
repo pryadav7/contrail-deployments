@@ -1,22 +1,4 @@
-- name: install epel
-  yum:
-    name: epel-release
-    state: latest
-
-- name: install centos-release-openstack-ocata
-  yum:
-    name: centos-release-openstack-ocata
-    state: installed
-
-- name: install ansible 2.3
-  yum:
-    name: ansible-2.3.1.0
-    state: installed
-
-- name: install pip
-  yum:
-    name: python-pip
-    state: latest
+---
 
 - name: create docker repo
   yum_repository:

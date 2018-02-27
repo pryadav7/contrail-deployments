@@ -1,8 +1,8 @@
-container_hosts:
+
+localhost:
   hosts:
-{% for host, values in container_hosts.hosts.iteritems() %}
-    {{ host }}:
-{% for param_key, param_value in values.iteritems() %}
-      {{ param_key }}: {{ param_value }}
-{% endfor %}
-{% endfor %}
+    localhost:
+      config_file: ../config/instances.yaml
+      connection: local
+      python_interpreter: python
+      ansible_python_interpreter: python

@@ -10,81 +10,70 @@ deployment:
     sku: ocata
     os: centos74
     version: master-20180131150536
+    orchestrator: openstack
 
-network:
+provider_config:
+  bms:
+    ssh_pwd: c0ntrail123
+    ssh_user: root
     ntpserver: 10.84.5.100
+    domainsuffix: local
 
-container_hosts:
-    hosts:
-        10.0.0.4:
-            ansible_user: root
-            ansible_ssh_pass: c0ntrail123
-            network_interface: eth1
-            kolla_external_vip_interface: eth0
-        10.0.0.5:
-            ansible_user: root
-            ansible_ssh_pass: c0ntrail123
-            network_interface: eth1
-            kolla_external_vip_interface: eth0
-        10.0.0.6:
-            ansible_user: root
-            ansible_ssh_pass: c0ntrail123
-            network_interface: eth1
-            kolla_external_vip_interface: eth0
-        10.0.0.7:
-            ansible_user: root
-            ansible_ssh_pass: c0ntrail123
-            network_interface: eth1
-            kolla_external_vip_interface: eth0
-        10.0.0.10:
-            ansible_user: root
-            ansible_ssh_pass: c0ntrail123
-            network_interface: eth1
-            kolla_external_vip_interface: eth0
+instances:
+  bms1:
+    provider: bms
+    ip: 10.0.0.4
+    roles:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+      openstack:
 
-roles:
-    10.0.0.5:
-        config_database:
-        config:
-        control:
-        webui:
-        analytics:
-        analytics_database:
-        openstack:
+  bms2:
+    provider: bms
+    ip: 10.0.0.5
+    roles:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+      openstack:
 
-    10.0.0.6:
-        config_database:
-        config:
-        control:
-        webui:
-        analytics:
-        analytics_database:
-        openstack:
+  bms3:
+    provider: bms
+    ip: 10.0.0.6
+    roles:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+      openstack:
 
-    10.0.0.10:
-        config_database:
-        config:
-        control:
-        webui:
-        analytics:
-        analytics_database:
-        openstack:
+  bms4:
+    provider: bms
+    ip: 10.0.0.7
+    roles:
+      vrouter:
 
-    10.0.0.4:
-        vrouter:
+  bms5:
+    provider: bms
+    ip: 10.0.0.10
+    roles:
+      vrouter:
 
-    10.0.0.7:
-        vrouter:
+contrail_configuration:
+  CONTAINER_REGISTRY: opencontrailnightly
+  CONTRAIL_VERSION: master-20180131150536-centos7-ocata
+  CLOUD_ORCHESTRATOR: openstack
 
-contrail_configs:
-    AAA_MODE: rbac
-    METADATA_PROXY_SECRET: c0ntrail123
-    CONFIG_NODES: 10.10.0.3,10.10.0.5,10.10.0.10
-    ANALYTICS_NODES: 10.10.0.3,10.10.0.5,10.10.0.10
-    PHYSICAL_INTERFACE: eth1
-    VROUTER_GATEWAY: 10.10.0.1 
-
-orchestrator_configs:
+orchestrator_configuration:
     keystone:
         version:
         username:
@@ -97,7 +86,7 @@ orchestrator_configs:
     external_vip: 10.0.0.200
     network_interface: eth1
 
-test_configs:
+test_configuration:
     image_web_server:
     mail_server:
     report_path:

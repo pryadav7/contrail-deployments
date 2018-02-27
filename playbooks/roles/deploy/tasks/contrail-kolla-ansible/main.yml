@@ -1,4 +1,5 @@
 ---
+
 - name: set kolla ansible repo version if undefined
   set_fact:
     kolla_branch: "{{ 'contrail/ocata' if (sku == 'ocata') else 'contrail/pike' }}"
@@ -21,63 +22,63 @@
 
 - name: set orchestrator configs if not defined
   set_fact:
-    orchestrator_configs: "{{ orchestrator_configs|default({})|combine({'keystone': {}}) }}"
-  when: orchestrator_configs is undefined or orchestrator_configs.keystone is undefined
+    orchestrator_configuration: "{{ orchestrator_configuration|default({})|combine({'keystone': {}}) }}"
+  when: orchestrator_configuration is undefined or orchestrator_configuration.keystone is undefined
 
 - name: set auth ip if roles undefined
   set_fact:
-     auth_ip: "{{ container_hosts.hosts.keys()[0] }}"
-  when: orchestrator_configs.internal_vip is undefined and roles is undefined
+     auth_ip: "{{ instances.value.ip[0] }}"
+  when: orchestrator_configuration.internal_vip is undefined and roles is undefined
 
-- name: set roles if undefined
-  set_fact:
-    roles: "{{ roles|default({})|combine({container_hosts.hosts.keys()[0]: {'openstack': None, 'vrouter': None}}) }}"
-  when: roles is undefined
+#- name: set roles if undefined
+#  set_fact:
+#    roles: "{{ roles|default({})|combine({container_hosts.hosts.keys()[0]: {'openstack': None, 'vrouter': None}}) }}"
+#  when: roles is undefined
 
 - name: get openstack ips
   vars:
     openstack_ips: []
   set_fact:
-     openstack_ips: "{{ openstack_ips + [ item.key ] }}"
-  when: item.value.openstack is defined
-  with_dict: "{{ roles }}"
+     openstack_ips: "{{ openstack_ips + [ item.value.ip ] }}"
+  when: item.value.roles.openstack is defined
+  with_dict: "{{ instances }}"
 
 - name: set auth ip if roles defined
   set_fact:
-      auth_ip: "{{ item.key }}"
-  when: item.value.openstack is defined and auth_ip is undefined
-  with_dict: "{{ roles }}"
+      auth_ip: "{{ item.value.ip }}"
+  when: item.value.roles.openstack is defined and auth_ip is undefined
+  with_dict: "{{ instances }}"
 
 - name: set auth ip if defined
   set_fact:
-     auth_ip: "{{ orchestrator_configs.internal_vip }}"
-  when: orchestrator_configs.internal_vip is defined
+     auth_ip: "{{ orchestrator_configuration.internal_vip }}"
+  when: orchestrator_configuration.internal_vip is defined
 
 - name: set kolla ansible external_vip_address if defined
   set_fact:
-    kolla_external_vip: "{{ orchestrator_configs.external_vip }}"
-  when:  orchestrator_configs.external_vip is defined
+    kolla_external_vip: "{{ orchestrator_configuration.external_vip }}"
+  when:  orchestrator_configuration.external_vip is defined
 
-- name: set contrail_configs if undefined
+- name: set contrail_configuration if undefined
   set_fact:
-    contrail_configs: {}
-  when: contrail_configs is undefined
+    contrail_configuration: {}
+  when: contrail_configuration is undefined
 
 - name: set contrail_api ip if external_vip is defined
   set_fact:
-    contrail_api_ip: "{{ contrail_configs.external_vip }}"
-  when: contrail_configs.external_vip is defined
+    contrail_api_ip: "{{ contrail_configuration.external_vip }}"
+  when: contrail_configuration.external_vip is defined
 
 - name: set contrail_api ip if internal_vip is defined
   set_fact:
-    contrail_api_ip: "{{ contrail_configs.internal_vip }}"
-  when: contrail_configs.internal_vip is defined
+    contrail_api_ip: "{{ contrail_configuration.internal_vip }}"
+  when: contrail_configuration.internal_vip is defined
 
 - name: calculate contrail_api ip if vip is undefined
   set_fact:
-    contrail_api_ip: "{{ item.key }}"
-  when: item.value.config is defined and contrail_api_ip is undefined
-  with_dict: "{{ roles }}"
+    contrail_api_ip: "{{ item.value.ip }}"
+  when: item.value.roles.config is defined and contrail_api_ip is undefined
+  with_dict: "{{ instances }}"
 
 - name: set kolla_registry if defined
   set_fact:
@@ -86,8 +87,8 @@
 
 - name: set network_interface if defined
   set_fact:
-    network_interface: "{{ orchestrator_configs.network_interface }}"
-  when: orchestrator_configs.network_interface is defined
+    network_interface: "{{ orchestrator_configuration.network_interface }}"
+  when: orchestrator_configuration.network_interface is defined
 
 - debug:
     msg: "Cloning contrail-kolla-ansible at {{ tmpdir.path }}"
@@ -110,13 +111,14 @@
     src: contrail-kolla-ansible/globals.yml.j2
     dest: "{{ tmpdir.path }}/etc/kolla/globals.yml"
 
-#- name: update top level wrapper for all playbooks (all.yml)
-#  template:
-#      src: contrail-kolla-ansible/all.yml.j2
-#      dest: "{{ tmpdir.path }}/ansible/all.yml"
+- name: update top level wrapper for all playbooks (all.yml)
+  template:
+      src: contrail-kolla-ansible/all.yml.j2
+      dest: "{{ tmpdir.path }}/ansible/all.yml"
 
 - name: update all-in one inventory for kolla deployment
   template:
     src: contrail-kolla-ansible/all-in-one.j2
     dest: "{{ tmpdir.path }}/ansible/inventory/all-in-one"
+
 

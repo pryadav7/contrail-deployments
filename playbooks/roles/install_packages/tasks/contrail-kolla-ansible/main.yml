@@ -1,50 +1,31 @@
-- name: install epel
-  yum:
-    name: epel-release
+---
+
+- name: install the latest version of packages
+  package:
+    name: "{{ item }}"
     state: latest
+  with_items:
+    - git
+    - epel-release
+    - centos-release-openstack-ocata
+    - python-oslo-config
+    - python-pip
+    - python2-jinja2
   delegate_to: localhost
 
-- name: install centos-release-openstack-ocata
-  yum:
-    name: centos-release-openstack-ocata
-    state: installed
-  delegate_to: localhost
-
-- name: install ansible 2.3
-  yum:
-    name: ansible-2.3.1.0
-    state: installed
-  delegate_to: localhost
-
-- name: install python-oslo-config
-  yum:
-    name: python-oslo-config
+- name: install packages
+  package:
+    name: "{{ item }}"
     state: latest
-  delegate_to: localhost
-
-- name: install pip
-  yum:
-    name: python-pip
-    state: latest
-  delegate_to: localhost
-
-- name: pip install jinja2
-  yum:
-    name: python2-jinja2
-    state: installed
-  delegate_to: localhost
-
-- name: install epel
-  yum:
-    name: epel-release
-    state: latest
-
-- name: install centos-release-openstack-ocata
-  yum:
-    name: centos-release-openstack-ocata
-    state: installed
+  with_items:
+    - epel-release
+    - centos-release-openstack-ocata
+    - python-pip
+    - python2-jinja2
+    - python-oslo-config
 
 - name: Load ip_vs module
   modprobe:
     name: ip_vs
     state: present
+

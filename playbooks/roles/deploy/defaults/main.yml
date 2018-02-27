@@ -14,3 +14,5 @@ vrouter_id: "{{ 255 | random }}"
 kolla_external_vip_interface: "eth0"
 network_interface: "eth0"
 rabbitmq_user: openstack
+
+

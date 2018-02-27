@@ -40,13 +40,17 @@
     src: contrail-ansible-deployer/hosts.j2
     dest: "{{ tmpdir.path }}/inventory/hosts"
 
+#- name: update container hosts
+#  template:
+#    src: contrail-ansible-deployer/container_hosts.yml.j2
+#    dest: "{{ tmpdir.path }}/inventory/group_vars/container_hosts.yml"
+
 #- name: update contrail inventory file
 #  template:
 #    src: contrail-ansible-deployer/all.yml.j2
 #    dest: "{{ tmpdir.path }}/inventory/group_vars/all.yml"
 
-- name: update container hosts
+- name: update contrail inventory file
   template:
-    src: contrail-ansible-deployer/container_hosts.yml.j2
-    dest: "{{ tmpdir.path }}/inventory/group_vars/container_hosts.yml"
-
+    src: contrail-ansible-deployer/instances.yaml.j2
+    dest: "{{ tmpdir.path }}/config/instances.yaml"

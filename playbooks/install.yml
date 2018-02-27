@@ -2,13 +2,13 @@
   strategy: debug
   tasks:
     - add_host:
-        name: "{{ item.key }}"
-        ansible_ssh_host: "{{ item.key }}"
+        name: "{{ item.value.ip }}"
+        ansible_ssh_host: "{{ item.value.ip }}"
         ansible_ssh_user: "{{ item.value.ansible_user | default('root') }}"
         ansible_ssh_pass: "{{ item.value.ansible_ssh_pass | default('c0ntrail123') }}"
         ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
         group: "container_hosts"
-      with_dict: "{{ container_hosts.hosts }}"
+      with_dict: "{{ instances }}"
 
 - hosts: container_hosts
   strategy: debug

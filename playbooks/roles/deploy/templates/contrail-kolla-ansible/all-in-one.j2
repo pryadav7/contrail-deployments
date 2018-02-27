@@ -1,31 +1,32 @@
 # These initial groups are the only groups required to be modified. The
 # additional groups are for more control of the environment.
 [control]
-{% if roles is defined %}
-{% for key, value in roles.iteritems() %}
-{% if "openstack" in value.keys() %}
-{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
 
+{% if instances is defined %}
+{% for key, value in instances.iteritems() %}
+{% if "openstack" in value['roles'] %}
+{{ value['ip'] }} ansible_connection=ssh ansible_ssh_user={{ provider_config.bms['ssh_user'] }} ansible_ssh_pass={{ provider_config.bms['ssh_pwd']}} 
 {% endif %}
 {% endfor %}
 {% endif %}
 
 [network]
-{% if roles is defined %}
-{% for key, value in roles.iteritems() %}
-{% if "openstack" in value.keys() %}
-{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
 
+{% if instances is defined %}
+{% for key, value in instances.iteritems() %}
+{% if "openstack" in value['roles'] %}
+{{ value['ip'] }} ansible_connection=ssh ansible_ssh_user={{ provider_config.bms['ssh_user'] }} ansible_ssh_pass={{ provider_config.bms['ssh_pwd']}}
 {% endif %}
 {% endfor %}
 {% endif %}
 
-[compute]
-{% if roles is defined %}
-{% for key, value in roles.iteritems() %}
-{% if "vrouter" in value.keys() %}
-{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
 
+[compute]
+
+{% if instances is defined %}
+{% for key, value in instances.iteritems() %}
+{% if "vrouter" in value['roles'] %}
+{{ value['ip'] }} ansible_connection=ssh ansible_ssh_user={{ provider_config.bms['ssh_user'] }} ansible_ssh_pass={{ provider_config.bms['ssh_pwd']}}
 {% endif %}
 {% endfor %}
 {% endif %}
@@ -34,11 +35,10 @@
 
 
 [monitoring]
-{% if roles is defined %}
-{% for key, value in roles.iteritems() %}
-{% if "openstack" in value.keys() %}
-{{ key }} {% for param_key, param_value in container_hosts.hosts[key].iteritems() %} {{ param_key }}={{ param_value }} {% endfor %}
-
+{% if instances is defined %}
+{% for key, value in instances.iteritems() %}
+{% if "openstack" in value['roles'] %}
+{{ value['ip'] }} ansible_connection=ssh ansible_ssh_user={{ provider_config.bms['ssh_user'] }} ansible_ssh_pass={{ provider_config.bms['ssh_pwd']}}
 {% endif %}
 {% endfor %}
 {% endif %}

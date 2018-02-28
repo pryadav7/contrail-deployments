@@ -24,6 +24,10 @@
     contrailregistry: "{{ deployment.type.contrail.registry }}"
   when: deployment.type.contrail.registry is defined
 
+- name: set controller nodes if defined
+  set_fact: 
+    controller_nodes: "{{ contrail_configuration.CONTROLLER_NODES }}"
+
 - debug:
     msg: "Cloning contrail-ansible-deployer at {{ tmpdir.path }}"
 

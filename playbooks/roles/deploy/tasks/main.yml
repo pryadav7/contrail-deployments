@@ -25,7 +25,7 @@
 
 - name: set orchestrator
   set_fact:
-    orchestrator: "{{ 'openstack' if (deployment.type.kolla is defined) else 'noauth' }}"
+    orchestrator: "{{ 'openstack' if (deployment.orchestrator is defined) else 'noauth' }}"
 
 - name: set docker os version
   set_fact:
@@ -68,16 +68,16 @@
   include: contrail-ansible-deployer/main.yml
   when: deployment.type.contrail is defined
 
-#- name: Provision OpenStack cluster with kolla
-#  command: >
-#    ansible-playbook -i inventory/all-in-one all.yml -v
-#  become: true
-#  become_user: root
-#  environment:
-#    ANSIBLE_HOST_KEY_CHECKING: 'false'
-#    ANSIBLE_STDOUT_CALLBACK: debug
-#  args:
-#    chdir: "{{ kolla_provision_dir }}/ansible"
+- name: Provision OpenStack cluster with kolla
+  command: >
+    ansible-playbook -i inventory/all-in-one all.yml -v
+  become: true
+  become_user: root
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: 'false'
+    ANSIBLE_STDOUT_CALLBACK: debug
+  args:
+    chdir: "{{ kolla_provision_dir }}/ansible"
 
 - name: Provision with Contrail
   command: >

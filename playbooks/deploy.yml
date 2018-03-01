@@ -1,4 +1,4 @@
 - hosts: localhost
-  strategy: debug
+  gather_facts: no
   roles:
   - deploy

@@ -111,10 +111,10 @@
     src: contrail-kolla-ansible/globals.yml.j2
     dest: "{{ tmpdir.path }}/etc/kolla/globals.yml"
 
-- name: update top level wrapper for all playbooks (all.yml)
-  template:
-      src: contrail-kolla-ansible/all.yml.j2
-      dest: "{{ tmpdir.path }}/ansible/all.yml"
+#- name: update top level wrapper for all playbooks (all.yml)
+#  template:
+#      src: contrail-kolla-ansible/all.yml.j2
+#      dest: "{{ tmpdir.path }}/ansible/all.yml"
 
 - name: update all-in one inventory for kolla deployment
   template:

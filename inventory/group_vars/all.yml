@@ -1,15 +1,14 @@
-
 deployment:
     type:
         kolla:
             branch: contrail/ocata
-            registry: docker.io
+            registry: ci-repo.englab.juniper.net:5000
         contrail:
             branch: master
-            registry: ci-repo.englab.juniper.net
+            registry: ci-repo.englab.juniper.net:5000
     sku: ocata
-    os: centos74
-    version: master-20180202171825
+    os: centos7
+    version: master-8
     orchestrator: openstack
 
 provider_config:
@@ -17,7 +16,6 @@ provider_config:
     ssh_pwd: c0ntrail123
     ssh_user: root
     ntpserver: 10.84.5.100
-    domainsuffix: local
 
 instances:
   bms1:
@@ -70,28 +68,34 @@ instances:
 
 contrail_configuration:
   AAA_MODE: rbac
-  CONFIG_API_USE_SSL:
-  INTROSPECT_SSL_ENABLE:
-  XMPP_SSL_ENABLE:
-  METADATA_PROXY_SECRET:
   CONTROLLER_NODES: 10.10.0.4,10.10.0.5,10.10.0.6
+  VROUTER_GATEWAY: 10.10.0.1
+  PHYSICAL_INTERFACE: eth1
 
 orchestrator_configuration:
     keystone:
-        version:
+        version: v3
         username:
         password: c0ntrail123
         project:
         region_name:
-        ssl:
-            certs:
     internal_vip: 10.10.0.200
     external_vip: 10.0.0.200
     network_interface: eth1
 
 test_configuration:
-    image_web_server:
+    image_web_server: 10.84.5.120
+    use_project_scoped_token: True
+    public_host: 10.84.5.120
+    web_server:
+        server:
+        username:
+        password:
+        report_path:
+        log_path:
+        web_root:
     mail_server:
-    report_path:
-    log_path:
-    keystonev3_use_project_scope:
+        server:
+        port:
+        to:
+        sender:

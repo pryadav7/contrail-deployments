@@ -1,0 +1,32 @@
+#
+# ansible-playbook -i inventory/ -e orchestrator=openstack playbook/install_contrail.yml
+#
+#
+- name: Create container host group
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  roles:
+    - name: Generate container_host group
+      role: create_container_host_group
+#    - name: Generate openstack host groups
+#      role: create_openstack_host_group
+#      when: orchestrator == 'openstack'
+#    - name: Generate openstack configurations
+#      role: create_openstack_config
+#      when: orchestrator == 'openstack'
+  vars_files:
+    - "{{ config_file }}"
+  tags:
+  - k8s
+
+#- include: install_kolla.yml
+#  when: orchestrator == 'openstack'
+
+- name: Install Contrail
+  hosts: container_hosts
+  gather_facts: yes
+  roles:
+  - install_contrail
+  vars_files:
+  - "{{ hostvars['localhost'].config_file }}"

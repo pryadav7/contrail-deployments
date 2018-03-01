@@ -1,5 +1,5 @@
 - hosts: localhost
-  strategy: debug
+  gather_facts: no
   tasks:
     - add_host:
         name: "{{ item.value.ip }}"
@@ -11,7 +11,7 @@
       with_dict: "{{ instances }}"
 
 - hosts: container_hosts
-  strategy: debug
+  gather_facts: no
   become: true
   become_user: root
   roles:

@@ -74,8 +74,8 @@
   become: true
   become_user: root
   environment:
-    ANSIBLE_HOST_KEY_CHECKING: 'false'
     ANSIBLE_STDOUT_CALLBACK: debug
+    ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
   args:
     chdir: "{{ kolla_provision_dir }}/ansible"
 
@@ -85,7 +85,7 @@
   become: true
   become_user: root
   environment:
-    ANSIBLE_HOST_KEY_CHECKING: 'false'
     ANSIBLE_STDOUT_CALLBACK: debug
+    ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
   args:
     chdir: "{{ contrail_provision_dir }}"

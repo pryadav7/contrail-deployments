@@ -12,6 +12,7 @@
     - python-pip
     - python2-jinja2
   delegate_to: localhost
+  run_once: True
 
 - name: install packages
   package:
@@ -28,4 +29,3 @@
   modprobe:
     name: ip_vs
     state: present
-

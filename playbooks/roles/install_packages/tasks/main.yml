@@ -25,3 +25,6 @@
 - name: install packages for contrail ansible deployer
   include: contrail-ansible-deployer/main.yml
   when: deployment.type.contrail is defined
+
+- name: set insecure registry
+  include: insecure_registry.yaml

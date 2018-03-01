@@ -39,10 +39,10 @@
     dest: "{{ tmpdir.path }}"
     version: "{{ contrail_branch }}"
 
-- name: update hosts file
-  template:
-    src: contrail-ansible-deployer/hosts.j2
-    dest: "{{ tmpdir.path }}/inventory/hosts"
+#- name: update hosts file
+#  template:
+#    src: contrail-ansible-deployer/hosts.j2
+#    dest: "{{ tmpdir.path }}/inventory/hosts"
 
 #- name: update container hosts
 #  template:
@@ -53,6 +53,11 @@
 #  template:
 #    src: contrail-ansible-deployer/all.yml.j2
 #    dest: "{{ tmpdir.path }}/inventory/group_vars/all.yml"
+
+- name: update contrail install file
+  copy:
+    src: contrail-ansible-deployer/install_contrail.yml
+    dest: "{{ tmpdir.path }}/playbooks/install_contrail.yml"
 
 - name: update contrail inventory file
   template:

@@ -19,12 +19,13 @@ instances:
 
 {% if contrail_configuration is defined %}
 contrail_configuration:
-{% for key, value in instances.iteritems() %}  {{ key }}: {{ value }}
-{% endif %}
+{% for key, value in contrail_configuration.iteritems() %}  {{ key }}: {{ value }}
+{% endfor %}
   CONTAINER_REGISTRY: {{ contrailregistry }}
   CONTRAIL_VERSION: {{ version }}-{{ 'centos7' if 'centos' in os else os }}-{{ sku }}
   CLOUD_ORCHESTRATOR: {{ orchestrator }} 
   CONTROLLER_NODES: {{ controller_nodes }}
+  METADATA_PROXY_SECRET: {{ metadata_secret }}
 {% if orchestrator == 'openstack' %}
   AUTH_MODE: keystone
   KEYSTONE_AUTH_ADMIN_PASSWORD: {{ admin_password }}

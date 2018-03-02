@@ -19,6 +19,8 @@ instances:
 
 {% if contrail_configuration is defined %}
 contrail_configuration:
+{% for key, value in instances.iteritems() %}  {{ key }}: {{ value }}
+{% endif %}
   CONTAINER_REGISTRY: {{ contrailregistry }}
   CONTRAIL_VERSION: {{ version }}-{{ 'centos7' if 'centos' in os else os }}-{{ sku }}
   CLOUD_ORCHESTRATOR: {{ orchestrator }} 

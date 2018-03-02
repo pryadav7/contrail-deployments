@@ -54,6 +54,11 @@
      auth_ip: "{{ orchestrator_configuration.internal_vip }}"
   when: orchestrator_configuration.internal_vip is defined
 
+- name: set keystone version if defined
+  set_fact:
+     keystone_version: "{{ orchestrator_configuration.keystone.version }}"
+  when: orchestrator_configuration.keystone is defined and orchestrator_configuration.keystone.version is defined
+
 - name: set kolla ansible external_vip_address if defined
   set_fact:
     kolla_external_vip: "{{ orchestrator_configuration.external_vip }}"

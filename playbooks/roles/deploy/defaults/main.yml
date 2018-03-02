@@ -15,3 +15,4 @@ kolla_external_vip_interface: "eth0"
 network_interface: "eth0"
 rabbitmq_user: openstack
 metadata_secret: c0ntrail123
+keystone_version: v3

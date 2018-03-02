@@ -1,9 +1,4 @@
 ---
-- name: copy deployment to temp variable
-  set_fact:
-     tmp_deployment: "{{ deployment }}"
-  when: deployment is defined
-
 - name: set default deployment
   vars:
     types:

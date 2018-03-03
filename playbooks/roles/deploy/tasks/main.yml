@@ -27,34 +27,6 @@
      os: "{{ deployment.os }}"
   when: deployment.os is defined
 
-#- name: create controller host list if not defined
-#  set_fact:
-#    controller: "{{ groups['container_hosts']|join(', ') }}"
-#  when: contrail_configs is undefined or contrail_configs.CONTROLLER_NODES is undefined
-
-#- name: create contrail_configs.CONTROLLER_NODES
-#  set_fact:
-#    contrail_configs: "{{ contrail_configs|default({})|combine({'CONTROLLER_NODES': controller}) }}"
-#  when: contrail_configs is undefined or contrail_configs.CONTROLLER_NODES is undefined
-
-#- set_fact:
-#    default_roles: "{{ default_roles|default({})|combine({item.0: item.1}) }}"
-#  with_together:
-#    - ['analytics', 'analytics_database', 'config', 'config_database', 'control', 'k8s_master', 'vrouter', 'webui']
-#    - []
-
-#- name: create roles
-#  set_fact:
-#    default_roles_hosts: "{{ default_roles_hosts|default({})|combine({item: default_roles}, recursive=True) }}"
-#  with_items:
-#    - "{{ groups['container_hosts'] }}"
-#  when: roles is undefined
-
-#- name: set roles if not defined
-#  set_fact:
-#    roles: "{{ default_roles_hosts }}"
-#  when: default_roles_hosts is defined
-
 - name: clone kolla ansible deployer
   include: contrail-kolla-ansible/main.yml
   when: deployment.type.kolla is defined

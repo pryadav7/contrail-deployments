@@ -1,6 +1,0 @@
-
-- name: trigger sanity for contrail ansible deployer
-  include: contrail-ansible-deployer/main.yml
-  when: deployment.type.contrail is defined
-
-

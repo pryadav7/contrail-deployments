@@ -8,7 +8,7 @@ deployment:
             registry: ci-repo.englab.juniper.net:5000
     sku: ocata
     os: centos7
-    version: master-8
+    version: master-centos7-ocata-bld-8
     orchestrator: openstack
 
 provider_config:
@@ -67,10 +67,10 @@ instances:
       vrouter:
 
 contrail_configuration:
-  AAA_MODE: rbac
-  CONTROLLER_NODES: 10.10.0.4,10.10.0.5,10.10.0.6
-  VROUTER_GATEWAY: 10.10.0.1
-  PHYSICAL_INTERFACE: eth1
+  AAA_MODE: no-auth
+  CONTROLLER_NODES: 10.0.0.4,10.0.0.5,10.0.0.6
+  VROUTER_GATEWAY: 10.0.0.1
+  PHYSICAL_INTERFACE: eth0
 
 orchestrator_configuration:
     keystone:
@@ -79,9 +79,8 @@ orchestrator_configuration:
         password: c0ntrail123
         project:
         region_name:
-    internal_vip: 10.10.0.200
-    external_vip: 10.0.0.200
-    network_interface: eth1
+    internal_vip: 10.0.0.200
+    network_interface: eth0
 
 test_configuration:
     image_web_server: 10.84.5.120

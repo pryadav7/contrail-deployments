@@ -1,4 +1,0 @@
-- hosts: localhost
-  strategy: debug
-  roles:
-  - trigger_sanity

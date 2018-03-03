@@ -1,3 +1,6 @@
+deployment:
+    orchestrator: {{ orchestrator }}
+
 {% if provider_config is defined %}
 provider_config:
   {{ provider_config | to_nice_yaml | indent(2, False) }}
@@ -11,18 +14,12 @@ instances:
 {% if contrail_configuration is defined %}
 contrail_configuration:
   {{ contrail_configuration | to_nice_yaml | indent(2, False) }}
-  CONTAINER_REGISTRY: {{ contrailregistry }}
-  CONTRAIL_VERSION: {{ version }}
-  CLOUD_ORCHESTRATOR: {{ orchestrator }} 
-  METADATA_PROXY_SECRET: {{ metadata_secret }}
-{% if controller_nodes is defined %}
-  CONTROLLER_NODES: {{ controller_nodes }}
-{% endif %}
 {% if orchestrator == 'openstack' %}
-  AUTH_MODE: keystone
-  KEYSTONE_AUTH_ADMIN_PASSWORD: {{ admin_password }}
-  KEYSTONE_AUTH_HOST: "{{ auth_ip }}"
-  KEYSTONE_AUTH_URL_VERSION: "/{{ keystone_version }}"
   RABBITMQ_NODE_PORT: "{{ contrail_rabbitmq_port }}"
 {% endif %}
+{% endif %}
+
+{% if test_configuration is defined %}
+test_configuration:
+  {{ test_configuration | to_nice_yaml | indent(2, False) }}
 {% endif %}

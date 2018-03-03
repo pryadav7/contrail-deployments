@@ -27,6 +27,7 @@
 - name: set controller nodes if defined
   set_fact: 
     controller_nodes: "{{ contrail_configuration.CONTROLLER_NODES }}"
+  when: contrail_configuration.CONTROLLER_NODES is defined
 
 - debug:
     msg: "Cloning contrail-ansible-deployer at {{ tmpdir.path }}"

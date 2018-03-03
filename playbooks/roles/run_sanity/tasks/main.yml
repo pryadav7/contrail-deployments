@@ -1,0 +1,49 @@
+- name: set default deployment
+  vars:
+    types:
+      kolla:
+      contrail:
+  set_fact:
+    deployment: "{{ deployment|default({})|combine({'type': types }) }}"
+  when: deployment is undefined or deployment.type is undefined
+
+- name: set contrail version
+  set_fact:
+    version: "{{ deployment.version }}"
+  when: deployment.version is defined
+
+- name: set contrailregistry if defined
+  set_fact:
+    contrailregistry: "{{ deployment.type.contrail.registry }}"
+  when: deployment.type.contrail is defined and deployment.type.contrail.registry is defined
+
+- name: Generate contrail-test-input.yml file
+  template:
+    src: contrail_test_input.yml.j2
+    dest: "/tmp/contrail_test_input.yml"
+
+- name: Pull docker test image
+  docker_image:
+    name: "{{ contrailregistry }}/contrail-test-test:{{ version }}"
+    state: present
+
+- name: Get testrunner script from github
+  get_url:
+    url: "https://raw.githubusercontent.com/Juniper/contrail-test-ci/master/testrunner.sh"
+    dest: "/tmp/testrunner.sh"
+    mode: 0755
+
+- name: List contrail-test containers
+  command: >
+    /tmp/testrunner.sh list -i
+  register: container_list
+
+- debug:
+    msg: "Container exists"
+  when: '"{{ version }}" in container_list.stdout'
+
+- name: Run contrail-test containers
+  command: >
+    /tmp/testrunner.sh run -P /tmp/contrail_test_input.yml -f sanity "{{ contrailregistry }}/contrail-test-test:{{ version }}"
+  become: yes
+  ignore_errors: yes

@@ -67,3 +67,4 @@
     ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
   args:
     chdir: "{{ contrail_provision_dir }}"
+  ignore_errors: yes

@@ -27,11 +27,11 @@
      os: "{{ deployment.os }}"
   when: deployment.os is defined
 
-- name: clone kolla ansible deployer
+- name: Update kolla ansible related attributes
   include: contrail-kolla-ansible/main.yml
   when: deployment.type.kolla is defined
 
-- name: clone contrail ansible deployer
+- name: Invoke contrail ansible deployer
   include: contrail-ansible-deployer/main.yml
   when: deployment.type.contrail is defined
 

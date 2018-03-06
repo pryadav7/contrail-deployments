@@ -30,14 +30,14 @@
   when: contrail_configuration.CONTROLLER_NODES is defined
 
 - debug:
-    msg: "Cloning contrail-ansible-deployer at {{ tmpdir.path }}"
+    msg: "Cloning contrail-ansible-deployer at {{ contrail_provision_dir }}"
 
 - name: clone contrail ansible repo for openstack
   git:
     repo: 'https://github.com/Juniper/contrail-ansible-deployer.git'
     accept_hostkey: yes
     update: yes
-    dest: "{{ tmpdir.path }}"
+    dest: "{{ contrail_provision_dir }}"
     version: "{{ contrail_branch }}"
 
 #- name: update hosts file

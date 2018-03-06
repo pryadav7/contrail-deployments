@@ -35,20 +35,31 @@
   include: contrail-ansible-deployer/main.yml
   when: deployment.type.contrail is defined
 
-- name: Provision OpenStack cluster with kolla
+#- name: Provision OpenStack cluster with kolla
+#  command: >
+#    ansible-playbook -i inventory/all-in-one all.yml -v
+#  become: true
+#  become_user: root
+#  environment:
+#    ANSIBLE_STDOUT_CALLBACK: debug
+#    ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
+#  args:
+#    chdir: "{{ kolla_provision_dir }}/ansible"
+
+- name: Configure nodes
   command: >
-    ansible-playbook -i inventory/all-in-one all.yml -v
+    ansible-playbook -i inventory/ playbooks/configure_instances.yml -v
   become: true
   become_user: root
   environment:
     ANSIBLE_STDOUT_CALLBACK: debug
     ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
   args:
-    chdir: "{{ kolla_provision_dir }}/ansible"
-
+    chdir: "{{ contrail_provision_dir }}"
+  
 - name: Provision with Contrail
   command: >
-    ansible-playbook -i inventory/ playbooks/install_contrail.yml -v
+    ansible-playbook -i inventory/ -e orchestrator=openstack playbooks/install_contrail.yml -v
   become: true
   become_user: root
   environment:

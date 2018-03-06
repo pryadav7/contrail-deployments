@@ -55,10 +55,10 @@
 #    src: contrail-ansible-deployer/all.yml.j2
 #    dest: "{{ tmpdir.path }}/inventory/group_vars/all.yml"
 
-- name: update contrail install file
-  copy:
-    src: contrail-ansible-deployer/install_contrail.yml
-    dest: "{{ tmpdir.path }}/playbooks/install_contrail.yml"
+#- name: update contrail install file
+#  copy:
+#    src: contrail-ansible-deployer/install_contrail.yml
+#    dest: "{{ tmpdir.path }}/playbooks/install_contrail.yml"
 
 - name: update contrail inventory file
   template:

@@ -1,3 +1,2 @@
-- include: install.yml
 - include: deploy.yml
 - include: run_sanity.yml

@@ -10,25 +10,20 @@
     kolla_branch: "{{ deployment.type.kolla.branch }}"
   when: deployment.type.kolla.branch is defined
 
-- name: create temp directory for kolla
-  tempfile:
-     state: directory
-     suffix: _kolla
-  register: tmpdir
+#- name: create temp directory for kolla
+#  tempfile:
+#     state: directory
+#     suffix: _kolla
+#  register: tmpdir
 
-- name: set kolla provision dir
-  set_fact:
-      kolla_provision_dir: "{{ tmpdir.path }}"
+#- name: set kolla provision dir
+#  set_fact:
+#      kolla_provision_dir: "{{ tmpdir.path }}"
 
 - name: set orchestrator configs if not defined
   set_fact:
     orchestrator_configuration: "{{ orchestrator_configuration|default({})|combine({'keystone': {}}) }}"
   when: orchestrator_configuration is undefined or orchestrator_configuration.keystone is undefined
-
-#- name: set roles if undefined
-#  set_fact:
-#    roles: "{{ roles|default({})|combine({container_hosts.hosts.keys()[0]: {'openstack': None, 'vrouter': None}}) }}"
-#  when: roles is undefined
 
 - name: get openstack ips
   vars:
@@ -69,21 +64,30 @@
     contrail_configuration: {}
   when: contrail_configuration is undefined
 
-- name: set contrail_api ip if external_vip is defined
+- name: set contrail_api ip if vip is defined
   set_fact:
-    contrail_api_ip: "{{ contrail_configuration.external_vip }}"
-  when: contrail_configuration.external_vip is defined
-
-- name: set contrail_api ip if internal_vip is defined
-  set_fact:
-    contrail_api_ip: "{{ contrail_configuration.internal_vip }}"
-  when: contrail_configuration.internal_vip is defined
+    contrail_api_ip: "{{ contrail_configuration.CONFIG_API_VIP }}"
+  when: contrail_configuration.CONFIG_API_VIP is defined
 
 - name: calculate contrail_api ip if vip is undefined
   set_fact:
     contrail_api_ip: "{{ item.value.ip }}"
   when: item.value.roles.config is defined and contrail_api_ip is undefined
   with_dict: "{{ instances }}"
+
+- name: if control data interface specified calculate contrail_api ip
+  shell: "ip addr show dev {{ contrail_configuration.PHYSICAL_INTERFACE }} | grep 'inet .*/.* brd ' | awk '{print $2}'"
+  when: >
+        contrail_configuration.PHYSICAL_INTERFACE is defined and
+        item.value.roles.config is defined and output is undefined
+  with_dict: "{{ instances }}"
+  register: output
+
+- name: set contrail_api ip if multi interface setup
+  set_fact: 
+    contrail_api_ip: "{{ item.stdout.split('/')[0] }}"
+  when: output is defined and item.changed
+  with_items: "{{ output.results }}"
 
 - name: set kolla_registry if defined
   set_fact:
@@ -95,35 +99,33 @@
     network_interface: "{{ orchestrator_configuration.network_interface }}"
   when: orchestrator_configuration.network_interface is defined
 
-- debug:
-    msg: "Cloning contrail-kolla-ansible at {{ tmpdir.path }}"
+#- debug:
+#    msg: "Cloning contrail-kolla-ansible at {{ tmpdir.path }}"
 
-- name: clone kolla ansible repo for openstack
-  git:
-    repo: 'https://github.com/Juniper/contrail-kolla-ansible.git'
-    accept_hostkey: yes
-    update: yes
-    dest: "{{ tmpdir.path }}"
-    version: "{{ kolla_branch }}"
+#- name: clone kolla ansible repo for openstack
+#  git:
+#    repo: 'https://github.com/Juniper/contrail-kolla-ansible.git'
+#    accept_hostkey: yes
+#    update: yes
+#    dest: "{{ tmpdir.path }}"
+#    version: "{{ kolla_branch }}"
 
-- name: update passwords for the hosts (passwords.yml)
-  template:
-    src: contrail-kolla-ansible/password.yml.j2
-    dest: "{{ tmpdir.path }}/etc/kolla/passwords.yml"
+#- name: update passwords for the hosts (passwords.yml)
+#  template:
+#    src: contrail-kolla-ansible/password.yml.j2
+#    dest: "{{ tmpdir.path }}/etc/kolla/passwords.yml"
 
-- name: update main configuration file (globals.yml)
-  template:
-    src: contrail-kolla-ansible/globals.yml.j2
-    dest: "{{ tmpdir.path }}/etc/kolla/globals.yml"
+#- name: update main configuration file (globals.yml)
+#  template:
+#    src: contrail-kolla-ansible/globals.yml.j2
+#    dest: "{{ tmpdir.path }}/etc/kolla/globals.yml"
 
 #- name: update top level wrapper for all playbooks (all.yml)
 #  template:
 #      src: contrail-kolla-ansible/all.yml.j2
 #      dest: "{{ tmpdir.path }}/ansible/all.yml"
 
-- name: update all-in one inventory for kolla deployment
-  template:
-    src: contrail-kolla-ansible/all-in-one.j2
-    dest: "{{ tmpdir.path }}/ansible/inventory/all-in-one"
-
-
+#- name: update all-in one inventory for kolla deployment
+#  template:
+#    src: contrail-kolla-ansible/all-in-one.j2
+#    dest: "{{ tmpdir.path }}/ansible/inventory/all-in-one"

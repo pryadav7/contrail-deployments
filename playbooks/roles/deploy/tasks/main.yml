@@ -20,7 +20,8 @@
 
 - name: set orchestrator
   set_fact:
-    orchestrator: "{{ 'openstack' if (deployment.orchestrator is defined) else 'noauth' }}"
+    orchestrator: "{{ deployment.orchestrator }}"
+  when: deployment.orchestrator is defined
 
 - name: set docker os version
   set_fact:
@@ -59,7 +60,7 @@
   
 - name: Provision with Contrail
   command: >
-    ansible-playbook -i inventory/ -e orchestrator=openstack playbooks/install_contrail.yml -v
+    ansible-playbook -i inventory/ -e orchestrator="{{ orchestrator }}" playbooks/install_contrail.yml -v
   become: true
   become_user: root
   environment:

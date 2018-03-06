@@ -12,30 +12,41 @@
     version: "{{ deployment.version }}"
   when: deployment.version is defined
 
+- name: set orchestrator
+  set_fact:
+    orchestrator: "{{ deployment.orchestrator }}"
+  when: deployment.orchestrator is defined
+
 - name: set contrailregistry if defined
   set_fact:
     contrailregistry: "{{ deployment.type.contrail.registry }}"
   when: deployment.type.contrail is defined and deployment.type.contrail.registry is defined
-
-- name: Generate contrail-test-input.yml file
-  template:
-    src: contrail_test_input.yml.j2
-    dest: "/tmp/contrail_test_input.yml"
 
 - name: Pull docker test image
   docker_image:
     name: "{{ contrailregistry }}/contrail-test-test:{{ version }}"
     state: present
 
+- name: create temp directory for test
+  tempfile:
+     state: directory
+     suffix: _test
+  register: tmpdir
+
+- name: Populate contrail-test-input.yml file
+  template:
+    src: contrail_test_input.yml.j2
+    dest: "{{ tmpdir.path }}/contrail_test_input.yml"
+
 - name: Get testrunner script from github
   get_url:
     url: "https://raw.githubusercontent.com/Juniper/contrail-test-ci/master/testrunner.sh"
-    dest: "/tmp/testrunner.sh"
+    dest: "{{ tmpdir.path }}/testrunner.sh"
     mode: 0755
 
 - name: List contrail-test containers
   command: >
-    /tmp/testrunner.sh list -i
+    "{{ tmpdir.path }}"/testrunner.sh list -i
   register: container_list
 
 - debug:
@@ -44,6 +55,6 @@
 
 - name: Run contrail-test containers
   command: >
-    /tmp/testrunner.sh run -P /tmp/contrail_test_input.yml -f sanity "{{ contrailregistry }}/contrail-test-test:{{ version }}"
+    "{{ tmpdir.path }}"/testrunner.sh run -P /tmp/contrail_test_input.yml -f sanity "{{ contrailregistry }}/contrail-test-test:{{ version }}"
   become: yes
   ignore_errors: yes

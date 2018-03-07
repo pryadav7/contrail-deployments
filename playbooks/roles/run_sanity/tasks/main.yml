@@ -44,6 +44,10 @@
     dest: "{{ tmpdir.path }}/testrunner.sh"
     mode: 0755
 
+- name: set feature to execute
+  set_fact:
+     feature: "{{ feature_dict[orchestrator] }}"
+
 - name: List contrail-test containers
   command: >
     "{{ tmpdir.path }}"/testrunner.sh list -i
@@ -55,6 +59,6 @@
 
 - name: Run contrail-test containers
   command: >
-    "{{ tmpdir.path }}"/testrunner.sh run -P /tmp/contrail_test_input.yml -f sanity "{{ contrailregistry }}/contrail-test-test:{{ version }}"
+    "{{ tmpdir.path }}/testrunner.sh run -P {{ tmpdir.path }}/contrail_test_input.yml -f {{ feature }} {{ contrailregistry }}/contrail-test-test:{{ version }}"
   become: yes
   ignore_errors: yes

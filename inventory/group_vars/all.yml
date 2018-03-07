@@ -8,7 +8,7 @@ deployment:
             registry: ci-repo.englab.juniper.net:5000
     sku: ocata
     os: centos7
-    version: master-centos7-ocata-bld-8
+    version: master-14-centos7-ocata
     orchestrator: openstack
 
 provider_config:

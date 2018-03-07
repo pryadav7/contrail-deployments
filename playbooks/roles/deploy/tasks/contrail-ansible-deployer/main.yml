@@ -17,7 +17,7 @@
 
 - name: set contrail provision dir
   set_fact:
-      contrail_provision_dir: "{{ tmpdir.path }}"/contrail-ansible-deployer
+      contrail_provision_dir: "{{ tmpdir.path }}/contrail-ansible-deployer"
 
 - name: set contrailregistry if defined
   set_fact:
@@ -63,4 +63,4 @@
 - name: update contrail inventory file
   template:
     src: contrail-ansible-deployer/instances.yaml.j2
-    dest: "{{ tmpdir.path }}/config/instances.yaml"
+    dest: "{{ contrail_provision_dir }}/config/instances.yaml"

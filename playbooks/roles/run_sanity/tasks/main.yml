@@ -58,7 +58,7 @@
   when: '"{{ version }}" in container_list.stdout'
 
 - name: Run contrail-test containers
-  command: >
-    "{{ tmpdir.path }}/testrunner.sh run -P {{ tmpdir.path }}/contrail_test_input.yml -f {{ feature }} {{ contrailregistry }}/contrail-test-test:{{ version }}"
+  shell: >
+    "{{ tmpdir.path }}"/testrunner.sh run -P "{{ tmpdir.path }}"/contrail_test_input.yml -f "{{ feature }}" "{{ contrailregistry }}"/contrail-test-test:"{{ version }}"
   become: yes
   ignore_errors: yes

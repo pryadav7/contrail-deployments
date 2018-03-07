@@ -94,6 +94,11 @@
     kolla_registry: "{{ deployment.type.kolla.registry }}"
   when: deployment.type.kolla.registry is defined
 
+- name: set kolla_external_vip_interface if defined
+  set_fact:
+    kolla_external_vip_interface: "{{ orchestrator_configuration.external_vip_interface }}"
+  when: orchestrator_configuration.external_vip_interface is defined
+
 - name: set network_interface if defined
   set_fact:
     network_interface: "{{ orchestrator_configuration.network_interface }}"

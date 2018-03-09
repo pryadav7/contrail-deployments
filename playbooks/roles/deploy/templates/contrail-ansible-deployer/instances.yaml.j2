@@ -44,6 +44,7 @@ kolla_config:
     enable_haproxy: {{ "yes" if openstack_ips is defined and openstack_ips|length > 1 else "no" }}
     docker_registry: {{ kolla_registry }}
     docker_namespace: {{ kolla_namespace }}
+    enable_ironic: "no"
   kolla_passwords:
     metadata_secret: {{ metadata_secret }}
     keystone_admin_password: {{ admin_password }}

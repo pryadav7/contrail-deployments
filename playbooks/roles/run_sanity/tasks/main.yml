@@ -40,7 +40,7 @@
 
 - name: Get testrunner script from github
   get_url:
-    url: "https://raw.githubusercontent.com/Juniper/contrail-test-ci/master/testrunner.sh"
+    url: "https://raw.githubusercontent.com/Juniper/contrail-test/master/testrunner.sh"
     dest: "{{ tmpdir.path }}/testrunner.sh"
     mode: 0755
 

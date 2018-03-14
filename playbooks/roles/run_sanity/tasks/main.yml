@@ -7,6 +7,22 @@
     deployment: "{{ deployment|default({})|combine({'type': types }) }}"
   when: deployment is undefined or deployment.type is undefined
 
+- name: restart docker - WA for 1755925
+  service:
+    enabled: yes
+    name: docker
+    state: restarted
+
+- name: Start all containers that were stopped (pass one - network containers)
+  shell: 'docker ps -a  --format "{% raw %}{{.Names}}{% endraw %}" | while read line; do docker start $line; done'
+  ignore_errors: true
+  become: true
+
+- name: Start all containers that were stopped (pass two - all containers)
+  shell: 'docker ps -a  --format "{% raw %}{{.Names}}{% endraw %}" | while read line; do docker start $line; done'
+  ignore_errors: true
+  become: true
+
 - name: set contrail version
   set_fact:
     version: "{{ deployment.version }}"

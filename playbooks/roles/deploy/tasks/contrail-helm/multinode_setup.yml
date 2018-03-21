@@ -1,0 +1,100 @@
+- name: set contrail helm repo version if undefined
+  set_fact:
+    contrail_branch: master
+  when: deployment.type.helm.branch is undefined
+
+- name: set contrail helm repo version if defined
+  set_fact:
+    contrail_branch: "{{ deployment.type.contrail.branch }}"
+  when: deployment.type.contrail.branch is defined
+
+- name: set contrail helm provision dir
+  set_fact:
+      contrail_helm_provision_dir: "/opt/contrail-helm-deployer"
+
+- name: set contrailregistry if defined
+  set_fact:
+    contrailregistry: "{{ deployment.type.contrail.registry }}"
+  when: deployment.type.contrail.registry is defined
+
+- name: get controller nodes
+  vars:
+    controller_nodes: []
+  set_fact:
+     controller_nodes: "{{ controller_nodes + [ item.value.ip ] }}"
+  when: item.value.roles.openstack is defined
+  with_dict: "{{ instances }}"
+
+- name: get control nodes if defined
+  set_fact:
+    control_nodes: "{{ contrail_configuration.CONTROL_NODES }}"
+  when: contrail_configuration.CONTROL_NODES is defined
+
+- name: get contrail aaa_mode if defined
+  set_fact:
+    aaa_mode: "{{ contrail_configuration.AAA_MODE }}"
+  when: contrail_configuration.AAA_MODE is defined
+
+- name: clone contrail helm deployer repo
+  git:
+    repo: 'https://github.com/Juniper/contrail-helm-deployer.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "/opt/contrail-helm-deployer"
+    version: "{{ contrail_branch }}"
+
+#- name: label nodes based on the roles  , needs to be updated for multinode
+#  command: "{{ item }}"
+#  with_items:
+#     - kubectl label node opencontrail.org/controller=enabled --all
+#     - kubectl label node opencontrail.org/vrouter-kernel=enabled --all
+
+- name: check if cluster admin file exists
+  stat: path="{{ contrail_helm_provision_dir }}/rbac/cluster-admin.yaml"
+  register: ca_file
+
+- name: K8s clusterrolebinding for contrail
+  command: kubectl replace -f rbac/cluster-admin.yaml
+  args:
+   chdir: "{{ contrail_helm_provision_dir }}"
+  when: ca_file.stat.exists
+
+- name: build all charts
+  command: make
+  args:
+    chdir: "{{ contrail_helm_provision_dir }}"
+
+- name: update contrail thirdparty, controller, analytics and vrouter values.yaml files
+  template:
+    src: "contrail-helm/{{ item }}-values.yaml.j2"
+    dest: "{{ contrail_helm_provision_dir }}/{{ item }}/values.yaml"
+  with_items:
+   - contrail-thirdparty
+   - contrail-controller
+   - contrail-analytics
+   - contrail-vrouter
+
+- name:  deploy contrail thirdparty charts
+  command: helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty --namespace=contrail
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- name: deploy contrail controller charts
+  command: helm install --name contrail-controller ${CHD_PATH}/contrail-controller --namespace=contrail
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- name: deploy contrail analytics
+  command: helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics --namespace=contrail
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- name: deploy contrail vrouter
+  command: helm install --name contrail-vrouter ${CHD_PATH}/contrail-vrouter --namespace=contrail
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- name: deploy heat charts
+  command: "./tools/deployment/multinode/151-heat-opencontrail.sh"
+  args:
+    chdir: "/opt/openstack-helm"

@@ -24,7 +24,12 @@
 
 - name: install packages for contrail ansible deployer
   include: contrail-ansible-deployer/main.yml
-  when: deployment.type.contrail is defined
+  when: deployment.type.contrail and deployment.type.kolla is defined
+
+- name: install packages for contrail helm deployer
+  include: contrail-helm/main.yml
+  when: deployment.type.helm is defined
 
 - name: set insecure registry
   include: insecure_registry.yaml
+  when: deployment.type.kolla is defined

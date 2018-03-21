@@ -1,0 +1,42 @@
+- name: get master node
+  set_fact:
+     master_node: "{{ ansible_default_ipv4.address }}"
+  when:
+    - item.value.ip == ansible_default_ipv4.address
+    - item.value.roles.openstack is defined
+  with_dict: "{{ instances }}"
+
+- debug:
+    msg: "{{ master_node }}"
+
+- name: get slave nodes
+  vars:
+    slave_nodes: []
+  set_fact:
+     slave_nodes: "{{ slave_nodes }} + [ '{{ item.value.ip }}' ]"
+  when: item.value.ip != ansible_default_ipv4.address
+  with_dict: "{{ instances }}"
+
+- debug:
+    msg: "{{ slave_nodes }}"
+
+- name: get setup type
+  set_fact:
+     setup_type: "aio"
+  when: slave_nodes|length == 0
+
+- name: get setup type
+  set_fact:
+     setup_type: "multinode"
+  when: slave_nodes|length >= 1
+
+- debug: 
+   msg: "Setup type : {{ setup_type }}"
+
+- name: deploy AIO openstack helm
+  include: aio_setup.yml
+  when: setup_type == "aio"
+
+- name: deploy Multinode openstack helm
+  include: multinode_setup.yml
+  when: setup_type == "multinode"

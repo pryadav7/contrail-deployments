@@ -1,0 +1,7 @@
+- name: deploy AIO contrail helm
+  include: aio_setup.yml
+  when: setup_type == "aio"
+
+- name: deploy Multinode contrail helm
+  include: multinode_setup.yml
+  when: setup_type == "multinode"

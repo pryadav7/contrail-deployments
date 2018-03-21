@@ -1,0 +1,100 @@
+images:
+  tags:
+    nodemgr: "{{ contrailregistry }}{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
+    build_driver_init: "{{ contrailregistry }}/contrail-vrouter-kernel-build-init:{{ sku }}-{{ version }}"
+    vrouter_agent: "{{ contrailregistry }}/contrail-vrouter-agent:{{ sku }}-{{ version }}"
+    vrouter_init_kernel: "{{ contrailregistry }}/contrail-vrouter-kernel-init:{{ sku }}-{{ version }}"
+    vrouter_dpdk: "{{ contrailregistry }}/contrail-vrouter-agent-dpdk:{{ sku }}-{{ version }}"
+    vrouter_init_dpdk: "{{ contrailregistry }}/contrail-vrouter-kernel-init-dpdk:{{ sku }}-{{ version }}"
+    dpdk_watchdog: "{{ contrailregistry }}/contrail-vrouter-net-watchdog:{{ sku }}-{{ version }}"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  vrouter_agent_kernel:
+    node_selector_key: "opencontrail.org/vrouter-kernel"
+    node_selector_value: "enabled"
+  vrouter_agent_dpdk:
+    node_selector_key: "opencontrail.org/vrouter-dpdk"
+    node_selector_value: "enabled"
+
+dependencies:
+  vrouter_agent_kernel:
+    daemonset:
+    - contrail-config
+    - contrail-control
+  vrouter_agent_dpdk:
+    daemonset:
+    - contrail-config
+    - contrail-control
+
+# common section for all vrouter variants
+# this section is commonized with other Contrails' services
+contrail_env:
+  CONTROLLER_NODES: {{controller_nodes|join(',')}}
+{% if control_nodes is defined %}
+  CONTROL_NODES: {{ control_nodes }}
+{% endif %}
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: {{ orchestrator }}
+  AAA_MODE: {{ aaa_mode | default(noauth) }}
+  # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
+  #METADATA_PROXY_SECRET: password
+  #CONTROL_DATA_NET_LIST: 8.0.0.0/24
+{% if contrail_configuration.CONTROL_DATA_NET_LIST is defined %}
+  CONTROL_DATA_NET_LIST: {{ contrail_configuration.CONTROL_DATA_NET_LIST }}
+{% endif %}
+{% if contrail_configuration.VROUTER_GATEWAY is defined %}
+  VROUTER_GATEWAY: {{ contrail_configuration.VROUTER_GATEWAY }}
+{% endif %}
+
+# section of vrouter template for kernel mode
+contrail_env_vrouter_kernel:
+{% if contrail_configuration.AGENT_MODE is defined %}
+  AGENT_MODE: {{ contrail_configuration.AGENT_MODE }}
+{% endif %}
+
+# section of vrouter template for dpdk mode
+contrail_env_vrouter_dpdk:
+  #CPU_CORE_MASK: "0xf"
+  #DPDK_UIO_DRIVER: uio_pci_generic
+  #HUGE_PAGES: 32000
+  #AGENT_MODE: dpdk
+  #HUGE_PAGES_DIR: /hugepages
+
+
+node:
+  host_os: ubuntu
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  cluster_domain_suffix: cluster.local
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+    namespace: openstack
+
+manifests:
+  configmap_env: true
+  daemonset_kernel: true
+  daemonset_dpdk: false

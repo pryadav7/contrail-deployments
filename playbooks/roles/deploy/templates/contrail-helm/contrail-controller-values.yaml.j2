@@ -1,0 +1,125 @@
+images:
+  tags:
+    nodemgr: "{{ contrailregistry }}/contrail-nodemgr:"
+    contrail_control: "{{ contrailregistry }}/contrail-controller-control-control:{{ sku }}-{{ version }}"
+    control_dns: "{{ contrailregistry }}/contrail-controller-control-dns:{{ sku }}-{{ version }}"
+    control_named: "{{ contrailregistry }}/contrail-controller-control-named:{{ sku }}-{{ version }}"
+    config_api: "{{ contrailregistry }}/contrail-controller-config-api:{{ sku }}-{{ version }}"
+    config_devicemgr: "{{ contrailregistry }}/contrail-controller-config-devicemgr:{{ sku }}-{{ version }}"
+    config_schema_transformer: "{{ contrailregistry }}/contrail-controller-config-schema:{{ sku }}-{{ version }}"
+    config_svcmonitor: "{{ contrailregistry }}/contrail-controller-config-svcmonitor:{{ sku }}-{{ version }}"
+    webui_middleware: "{{ contrailregistry }}/contrail-controller-webui-job:{{ sku }}-{{ version }}"
+    webui: "{{ contrailregistry }}/contrail-controller-webui-web:{{ sku }}-{{ version }}"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  control:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  control_only:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  webui:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+dependencies:
+  config:
+    daemonset:
+    - contrail-configdb
+  control:
+    daemonset:
+    - contrail-config
+  webui:
+    daemonset:
+    - contrail-config
+    - contrail-redis
+
+contrail_env:
+  CONTROLLER_NODES: {{controller_nodes|join(',')}} 
+{% if control_nodes is defined %}
+  CONTROL_NODES: {{ control_nodes }}
+{% endif %}
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: {{ orchestrator }}
+  AAA_MODE: {{ aaa_mode | default(noauth) }}
+  BGP_PORT: 1179
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  cluster_domain_suffix: cluster.local
+  rabbitmq:
+    auth:
+      username: rabbitmq
+      password: password
+    path: /
+    scheme: rabbit
+    port:
+      amqp:
+        default: 5672
+    hosts:
+      default: rabbitmq
+    host_fqdn_override:
+       default: null
+    domain_override: null
+    namespace: openstack
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+    namespace: openstack
+  nova_metadata:
+    name: nova
+    hosts:
+      default: metadata
+    host_fqdn_override:
+      default: null
+    path:
+      default: /
+    scheme:
+      default: 'http'
+    port:
+      metadata:
+        default: 8775
+        public: 80
+    namespace: openstack
+
+# Service related inputs are defined here
+service:
+  config_api_public_port: ""
+
+manifests:
+  configmap_env: true
+  daemonset_config: true
+  daemonset_control: true
+  daemonset_control_only: false
+  daemonset_webui: true
+  service_config_api_server: true
+  service_config_ingress: true
+  service_web_controller: true
+  service_webui_ingress: true
+  ingress_webui: true
+  ingress_config_api: true

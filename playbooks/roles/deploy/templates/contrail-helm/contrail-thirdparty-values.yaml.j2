@@ -1,0 +1,88 @@
+images:
+  tags:
+    kafka: "{{ contrailregistry }}/contrail-external-kafka:{{ sku }}-{{ version }}"
+    cassandra: "{{ contrailregistry }}/contrail-external-cassandra:{{ sku }}-{{ version }}"
+    redis: "redis:4.0.2"
+    zookeeper: "{{ contrailregistry }}/contrail-external-zookeeper:{{ sku }}-{{ version }}"
+    nodemgr: "{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+
+labels:
+  configdb:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analyticsdb:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analytics_zookeeper:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  config_zookeeper:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  redis:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  kafka:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+  analyticsdb_nodemgr:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+dependencies:
+  kafka:
+    daemonset:
+    - contrail-analytics-zookeeper
+  analyticsdb:
+    daemonset:
+    - contrail-analytics-zookeeper
+    - contrail-kafka
+  configdb:
+    daemonset:
+    - contrail-config-zookeeper
+  analyticsdb_nodemgr:
+    daemonset:
+    - contrail-analyticsdb
+
+
+contrail_env:
+  CONTROLLER_NODES: {{controller_nodes|join(',')}}
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: {{ orchestrator }}
+  AAA_MODE: {{ aaa_mode | default(noauth)}}
+
+endpoints:
+  cluster_domain_suffix: cluster.local
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+    namespace: openstack
+
+manifests:
+  configmap_env: true
+  daemonset_configdb: true
+  daemonset_analyticsdb: true
+  daemonset_redis: true
+  daemonset_analytics_zookeeper: true
+  daemonset_config_zookeeper: true
+  daemonset_kafka: true
+  daemonset_analyticsdb_nodemgr: true

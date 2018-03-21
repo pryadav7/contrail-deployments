@@ -1,0 +1,83 @@
+images:
+  tags:
+    nodemgr: "{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
+    analytics_api: "{{ contrailregistry }}/contrail-analytics-api:{{ sku }}-{{ version }}"
+    contrail_collector: "{{ contrailregistry }}/contrail-analytics-collector:{{ sku }}-{{ version }}"
+    analytics_alarm_gen: "{{ contrailregistry }}/contrail-analytics-alarm-gen:{{ sku }}-{{ version }}"
+    analytics_query_engine: "{{ contrailregistry }}/contrail-analytics-query-engine:{{ sku }}-{{ version }}"
+    analytics_snmp_collector: "{{ contrailregistry }}/contrail-analytics-snmp-collector:{{ sku }}-{{ version }}"
+    contrail_topology: "{{ contrailregistry }}/contrail-analytics-topology:{{ sku }}-{{ version }}"
+    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+  imagePullPolicy: "IfNotPresent"
+
+labels:
+  analytics:
+    node_selector_key: opencontrail.org/controller
+    node_selector_value: "enabled"
+
+
+dependencies:
+  analytics:
+    daemonset:
+    - contrail-analyticsdb
+    - contrail-config
+
+contrail_env:
+  CONTROLLER_NODES: {{controller_nodes|join(',')}}
+  LOG_LEVEL: SYS_NOTICE
+  CLOUD_ORCHESTRATOR: {{ orchestrator }}
+  AAA_MODE: {{ aaa_mode | default(noauth) }}
+
+# typically overriden by environmental
+# values, but should include all endpoints
+# required by this chart
+endpoints:
+  cluster_domain_suffix: cluster.local
+  rabbitmq:
+    auth:
+      username: rabbitmq
+      password: password
+    path: /
+    scheme: rabbit
+    port:
+      amqp:
+        default: 5672
+    hosts:
+      default: rabbitmq
+    host_fqdn_override:
+       default: null
+    domain_override: null
+    namespace: openstack
+  keystone:
+    auth:
+      username: admin
+      password: password
+      project_name: admin
+      user_domain_name: default
+      project_domain_name: default
+      region_name: RegionOne
+    hosts:
+      default: keystone-api
+    path:
+      default: /v3
+    port:
+      admin:
+        default: 35357
+      api:
+        default: 80
+    scheme:
+      default: http
+    host_fqdn_override:
+       default: null
+    namespace: openstack
+
+# Service related inputs are defined here
+service:
+  analytics_api_public_port: ""
+
+manifests:
+  configmap_env: true
+  daemonset_analytics: true
+  service_analytics_api_server: true
+  service_analytics_api_ingress: true
+  ingress_analytics_api: trues

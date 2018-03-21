@@ -28,13 +28,21 @@
      os: "{{ deployment.os }}"
   when: deployment.os is defined
 
+#- name: clone openstack helm repos
+#  include: openstack-helm/main.yml
+#  when: deployment.type.helm is defined
+
+- name: clone contrail helm deployer repo
+  include: contrail-helm/main.yml
+  when: deployment.type.helm is defined and deployment.type.contrail is defined
+
 - name: Update kolla ansible related attributes
   include: contrail-kolla-ansible/main.yml
   when: deployment.type.kolla is defined
 
 - name: Invoke contrail ansible deployer
   include: contrail-ansible-deployer/main.yml
-  when: deployment.type.contrail is defined
+  when: deployment.type.contrail and deployment.type.kolla is defined
 
 #- name: Provision OpenStack cluster with kolla
 #  command: >
@@ -57,6 +65,7 @@
     ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
   args:
     chdir: "{{ contrail_provision_dir }}"
+  when: deployment.type.contrail and deployment.type.kolla is defined
   
 - name: Provision with Contrail
   command: >
@@ -68,3 +77,4 @@
     ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
   args:
     chdir: "{{ contrail_provision_dir }}"
+  when: deployment.type.contrail and deployment.type.kolla is defined

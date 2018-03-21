@@ -1,0 +1,37 @@
+- name: update contrail thirdparty, controller, analytics and vrouter values.yaml files
+  template:
+    src: "contrail-helm/{{ item }}-values.yaml.j2"
+    dest: "{{ tmpdir.path }}/{{ item }}/values.yaml"
+  with_items:
+   - contrail-thirdparty
+   - contrail-controller
+   - contrail-analytics
+   - contrail-vrouter
+
+- name: contrail third party
+  command: helm install --name contrail-thirdparty ${CHD_PATH}/contrail-thirdparty --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- debug:
+  msg: "{{ conf_nodes }}"
+
+- name: contrail controller
+  command: helm install --name contrail-controller ${CHD_PATH}/contrail-controller --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- name: contrail analytics
+  command: helm install --name contrail-analytics ${CHD_PATH}/contrail-analytics --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- name: contrail third party
+  command: helm install --name contrail-thirdparty ${CHD_PATH}/contrail-vrouter --namespace=contrail --set contrail_env.CONTROLLER_NODES=172.17.0.1
+  environment:
+    CHD_PATH: "{{ contrail_helm_provision_dir }}"
+
+- name: deploy heat charts
+  command: "./tools/deployment/developer/nfs/091-heat-opencontrail.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"

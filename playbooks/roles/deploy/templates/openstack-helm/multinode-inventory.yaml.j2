@@ -1,0 +1,21 @@
+all:
+ children:
+   primary:
+     hosts:
+       node_master:
+         ansible_port: 22
+         ansible_host: {{ master_node }}
+         ansible_user: root
+         ansible_ssh_private_key_file: /root/.ssh/id_rsa
+         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+
+   nodes:
+     hosts:
+{% for node in slave_nodes %}
+       node_{{loop.index}}:
+         ansible_port: 22
+         ansible_host: {{ node }}
+         ansible_user: root
+         ansible_ssh_private_key_file: /root/.ssh/id_rsa
+         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+{% endfor %}

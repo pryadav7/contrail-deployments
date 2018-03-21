@@ -1,0 +1,94 @@
+---
+
+- name: set openstack helm repo version if undefined
+  set_fact:
+    openstack_helm_branch: master
+  when: deployment.type.helm.branch is undefined
+
+- name: set openstack helm repo version if defined
+  set_fact:
+    openstack_helm_branch: "{{ deployment.type.helm.branch }}"
+  when: deployment.type.helm.branch is defined
+
+- name: create temp directory for openstack helm repo
+  tempfile:
+     state: directory
+     suffix: _openstack_helm
+  register: tmpdir_OSH
+
+- name: create temp directory for openstack helm infra
+  tempfile:
+     state: directory
+     suffix: _openstack_helm_infra
+  register: tmpdir_OSH_INFRA
+
+- name: set openstack helm provision dir
+  set_fact:
+      openstack_helm_dir: "{{ tmpdir_OSH.path }}"
+
+- name: set openstack helm infra dir
+  set_fact:
+      openstack_helm_infra_dir: "{{ tmpdir_OSH_INFRA.path }}"
+
+- name: set openstack helm registry if defined
+  set_fact:
+    openstackregistry: "{{ deployment.type.helm.registry }}"
+  when: deployment.type.helm.registry is defined
+
+- name: clone openstack helm repo
+  git:
+    repo: 'https://github.com/Juniper/openstack-helm.git'
+    accept_hostkey: yes
+
+    update: yes
+    dest: "{{ tmpdir_OSH.path }}"
+    version: "{{ openstack_helm_branch }}"
+
+- name: clone openstack helm infra repo
+  git:
+    repo: 'https://github.com/Juniper/openstack-helm-infra.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "{{ tmpdir_OSH_INFRA.path }}"
+    version: "{{ openstack_helm_branch }}"
+
+- name: check if rbac dev file exists
+  stat: path="{{ tmpdir_OSH.path }}tools/kubeadm-aio/assets/opt/rbac/dev.yaml"
+  register: rbac_file
+
+- name: install rbac
+  command: kubectl replace -f tools/kubeadm-aio/assets/opt/rbac/dev.yaml
+  args:
+   chdir: "{{ tmpdir_OSH.path }}"
+  when: rbac_file.stat.exists
+
+- name: deploy kubernetes
+  command: "./tools/deployment/developer/common/{{ item }}"
+  with_items:
+    - 010-deploy-k8s.sh
+    - 020-setup-client.sh
+    - 030-ingress.sh
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ tmpdir_OSH.path }}"
+   OSH_INFRA_PATH: "{{ tmpdir_OSH_INFRA.path }}"
+
+- name: deploy openstack-helm charts
+  command: "./tools/deployment/developer/nfs/{{ item }}"
+  with_items:
+    - 040-nfs-provisioner.sh
+    - 050-mariadb.sh
+    - 060-rabbitmq.sh
+    - 070-memcached.sh
+    - 080-keystone.sh
+    - 100-horizon.sh
+    - 120-glance.sh
+    - 151-libvirt-opencontrail.sh
+    - 161-compute-kit-opencontrail.sh
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ tmpdir_OSH.path }}"
+   OSH_INFRA_PATH: "{{ tmpdir_OSH_INFRA.path }}"
+

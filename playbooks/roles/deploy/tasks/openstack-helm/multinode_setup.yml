@@ -1,0 +1,211 @@
+---
+
+- name: Generate SSH keys
+  shell: ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
+  args:
+    creates: /root/.ssh/id_rsa
+
+- name: Copy SSH key to all nodes
+  command: sshpass -p c0ntrail123 ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no root@{{ item.value.ip }}
+  with_dict: "{{ instances }}"
+
+- name: set openstack helm repo version if undefined
+  set_fact:
+    openstack_helm_branch: master
+  when: deployment.type.helm.branch is undefined
+
+- name: set openstack helm repo version if defined
+  set_fact:
+    openstack_helm_branch: "{{ deployment.type.helm.branch }}"
+  when: deployment.type.helm.branch is defined
+
+#- name: Clone all repos on slave nodes
+#  hosts: slave_nodes
+#  include: clone_repos.yaml
+
+- name: set openstack helm provision dir
+  set_fact:
+     openstack_helm_dir: "/opt/openstack-helm"
+
+- name: set openstack helm infra dir
+  set_fact:
+       openstack_helm_infra_dir: "/opt/openstack-helm-infra"
+
+- name: set openstack helm registry if defined
+  set_fact:
+    openstackregistry: "{{ deployment.type.helm.registry }}"
+  when: deployment.type.helm.registry is defined
+
+- name: clone openstack helm repo
+  git:
+    repo: 'https://github.com/Juniper/openstack-helm.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "/opt/openstack-helm"
+    version: "{{ openstack_helm_branch }}"
+
+- name: clone openstack helm infra repo
+  git:
+    repo: 'https://github.com/Juniper/openstack-helm-infra.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "/opt/openstack-helm-infra"
+    version: "{{ openstack_helm_branch }}"
+
+# Update local-vars.yaml for different version of kubernetes, cni, calico
+
+- name: Install opencontrail packages
+  command: "./tools/deployment/developer/common/{{ item }}"
+  with_items:
+    - 001-install-packages-opencontrail.sh
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: Create an environment file on the master node for the cluster
+  template:
+    src: "openstack-helm/multinode-inventory.yaml.j2"
+    dest: "{{ openstack_helm_infra_dir }}/tools/gate/devel/multinode-inventory.yaml"
+
+- name: Create an environment file on the master node for the cluster
+  template:
+    src: "openstack-helm/multinode-vars.yaml.j2"
+    dest: "{{ openstack_helm_infra_dir }}/tools/gate/devel/multinode-vars.yaml"
+
+#- name: set environment variable
+#  command: export {{ item }}
+#  with_items:
+#    - OSH_PATH="{{ openstack_helm_dir }}"
+#    - OSH_INFRA_PATH="{{ openstack_helm_infra_dir }}"
+
+- name: deploy kubernetes - setup-host
+  command: make dev-deploy setup-host multinode
+  args:
+   chdir: "{{ openstack_helm_infra_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy kubernetes - k8s
+  command: make dev-deploy k8s multinode
+  args:
+   chdir: "{{ openstack_helm_infra_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: setup client
+  command: "./tools/deployment/multinode/010-setup-client.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy ingress chart
+  command: "./tools/deployment/multinode/021-ingress-opencontrail.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy ceph chart
+  command: "./tools/deployment/multinode/030-ceph.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy ceph-ns chart
+  command: "./tools/deployment/multinode/040-ceph-ns-activate.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy mariadb chart
+  command: "./tools/deployment/multinode/050-mariadb.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy rabbitmq chart
+  command: "./tools/deployment/multinode/060-rabbitmq.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy memcached chart
+  command: "./tools/deployment/multinode/070-memcached.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy keystone chart
+  command: "./tools/deployment/multinode/080-keystone.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy ceph-radosgateway chart
+  command: "./tools/deployment/multinode/090-ceph-radosgateway.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy horizon chart
+  command: "./tools/deployment/multinode/100-horizon.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy glance chart
+  command: "./tools/deployment/multinode/100-glance.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy cinder chart
+  command: "./tools/deployment/multinode/110-cinder.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy libvert chart
+  command: "./tools/deployment/multinode/131-libvirt-opencontrail.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: deploy compute-kit chart
+  command: "./tools/deployment/multinode/141-compute-kit-opencontrail.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+  ignore_errors: yes
+

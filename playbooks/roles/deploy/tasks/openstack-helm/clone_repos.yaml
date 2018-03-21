@@ -1,0 +1,23 @@
+- name: clone openstack helm infra
+  git:
+    repo: 'https://github.com/Juniper/openstack-helm-infra.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "/opt/openstack-helm-infra"
+    version: "{{ openstack_helm_branch }}"
+
+- name: clone openstack helm
+  git:
+    repo: 'https://github.com/Juniper/openstack-helm.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "/opt/openstack-helm"
+    version: "{{ openstack_helm_branch }}"
+
+- name: clone contrail helm deployer repo
+  git:
+    repo: 'https://github.com/Juniper/contrail-helm-deployer.git'
+    accept_hostkey: yes
+    update: yes
+    dest: "/opt/contrail-helm-deployer"
+    version: "{{ deployment.type.contrail.branch  }}"

@@ -1,6 +1,56 @@
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - add_host:
+        name: "{{ item.value.ip }}"
+        ansible_ssh_host: "{{ item.value.ip }}"
+        ansible_ssh_user: "{{ item.value.ansible_user | default('root') }}"
+        ansible_ssh_pass: "{{ item.value.ansible_ssh_pass | default('c0ntrail123') }}"
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+        group: "container_hosts"
+      with_dict: "{{ instances }}"
+      when: deployment.type.helm is defined
+
+- hosts: container_hosts
+  gather_facts: yes
+  become: true
+  become_user: root
+  tasks:
+    - name: uname
+      command: uname -a
+      when: deployment.type.helm is defined
+    - name: clone openstack helm infra
+      git:
+        repo: 'https://github.com/Juniper/openstack-helm-infra.git'
+        accept_hostkey: yes
+        update: yes
+        dest: "/opt/openstack-helm-infra"
+        version: "{{ deployment.type.contrail.branch }}"
+      when: deployment.type.helm is defined
+
+    - name: clone openstack helm
+      git:
+        repo: 'https://github.com/Juniper/openstack-helm.git'
+        accept_hostkey: yes
+        update: yes
+        dest: "/opt/openstack-helm"
+        version: "{{ deployment.type.contrail.branch }}"
+      when: deployment.type.helm is defined
+
+    - name: clone contrail helm deployer repo
+      git:
+        repo: 'https://github.com/Juniper/contrail-helm-deployer.git'
+        accept_hostkey: yes
+        update: yes
+        dest: "/opt/contrail-helm-deployer"
+        version: "{{ deployment.type.contrail.branch  }}"
+      when: deployment.type.helm is defined
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: ‘false’
+    ANSIBLE_STDOUT_CALLBACK: debug
+
 - hosts: localhost
   gather_facts: yes
   roles:
   - deploy
-
-

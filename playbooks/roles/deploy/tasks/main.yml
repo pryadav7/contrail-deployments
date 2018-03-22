@@ -28,9 +28,9 @@
      os: "{{ deployment.os }}"
   when: deployment.os is defined
 
-#- name: clone openstack helm repos
-#  include: openstack-helm/main.yml
-#  when: deployment.type.helm is defined
+- name: clone openstack helm repos
+  include: openstack-helm/main.yml
+  when: deployment.type.helm is defined
 
 - name: clone contrail helm deployer repo
   include: contrail-helm/main.yml
@@ -43,17 +43,6 @@
 - name: Invoke contrail ansible deployer
   include: contrail-ansible-deployer/main.yml
   when: deployment.type.contrail and deployment.type.kolla is defined
-
-#- name: Provision OpenStack cluster with kolla
-#  command: >
-#    ansible-playbook -i inventory/all-in-one all.yml -v
-#  become: true
-#  become_user: root
-#  environment:
-#    ANSIBLE_STDOUT_CALLBACK: debug
-#    ANSIBLE_LOG_PATH: "{{ playbook_dir }}/../ansible.log"
-#  args:
-#    chdir: "{{ kolla_provision_dir }}/ansible"
 
 - name: Configure nodes
   command: >

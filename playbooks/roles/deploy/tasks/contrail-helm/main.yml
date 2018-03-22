@@ -1,3 +1,4 @@
+
 - name: deploy AIO contrail helm
   include: aio_setup.yml
   when: setup_type == "aio"

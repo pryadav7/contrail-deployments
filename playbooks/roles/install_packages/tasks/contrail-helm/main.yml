@@ -1,5 +1,5 @@
 #- name: Update all packages to the latest version
-#  apt:
+# apt:
 #    upgrade: dist
 
 - name: install python 2
@@ -10,9 +10,16 @@
     name: "{{ item }}"
     state: latest
   with_items:
+    - ntp
+    - sshpass
     - git
 
-#- name: Disable UFW
-#  ufw:
-#    state: enabled
+- name: configure ntp server
+  template: 
+    src: ntp.conf.j2
+    dest: "/etc/ntp.conf"
+
+- name: Disable UFW
+  command: service ufw stop
+
 

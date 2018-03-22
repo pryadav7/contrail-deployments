@@ -1,14 +1,48 @@
-images:
-  tags:
-    nodemgr: "{{ contrailregistry }}{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
-    build_driver_init: "{{ contrailregistry }}/contrail-vrouter-kernel-build-init:{{ sku }}-{{ version }}"
-    vrouter_agent: "{{ contrailregistry }}/contrail-vrouter-agent:{{ sku }}-{{ version }}"
-    vrouter_init_kernel: "{{ contrailregistry }}/contrail-vrouter-kernel-init:{{ sku }}-{{ version }}"
-    vrouter_dpdk: "{{ contrailregistry }}/contrail-vrouter-agent-dpdk:{{ sku }}-{{ version }}"
-    vrouter_init_dpdk: "{{ contrailregistry }}/contrail-vrouter-kernel-init-dpdk:{{ sku }}-{{ version }}"
-    dpdk_watchdog: "{{ contrailregistry }}/contrail-vrouter-net-watchdog:{{ sku }}-{{ version }}"
-    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
-  imagePullPolicy: "IfNotPresent"
+global:
+  images:
+    tags:
+      nodemgr: "{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
+      build_driver_init: "{{ contrailregistry }}/contrail-vrouter-kernel-build-init:{{ sku }}-{{ version }}"
+      vrouter_agent: "{{ contrailregistry }}/contrail-vrouter-agent:{{ sku }}-{{ version }}"
+      vrouter_init_kernel: "{{ contrailregistry }}/contrail-vrouter-kernel-init:{{ sku }}-{{ version }}"
+      vrouter_dpdk: "{{ contrailregistry }}/contrail-vrouter-agent-dpdk:{{ sku }}-{{ version }}"
+      vrouter_init_dpdk: "{{ contrailregistry }}/contrail-vrouter-kernel-init-dpdk:{{ sku }}-{{ version }}"
+      dpdk_watchdog: "{{ contrailregistry }}/contrail-vrouter-net-watchdog:{{ sku }}-{{ version }}"
+      dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+    imagePullPolicy: "IfNotPresent"
+
+  # common section for all vrouter variants
+  # this section is commonized with other Contrails' services
+  contrail_env:
+    CONTROLLER_NODES: {{controller_nodes|join(',')}}
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: {{ orchestrator }}
+    AAA_MODE: {{ aaa_mode | default(noauth) }}
+    # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
+    #METADATA_PROXY_SECRET: password
+{% if contrail_configuration.CONTROL_DATA_NET_LIST is defined %}
+    CONTROL_DATA_NET_LIST: {{ contrail_configuration.CONTROL_DATA_NET_LIST }}
+{% endif %}
+{% if contrail_configuration.VROUTER_GATEWAY is defined %}
+    VROUTER_GATEWAY: {{ contrail_configuration.VROUTER_GATEWAY }}
+{% endif %}
+
+  # section of vrouter template for kernel mode
+  contrail_env_vrouter_kernel:
+{% if contrail_configuration.AGENT_MODE is defined %}
+    AGENT_MODE: {{ contrail_configuration.AGENT_MODE }}
+{% endif %}
+  # section of vrouter template for dpdk mode
+  contrail_env_vrouter_dpdk:
+    #CPU_CORE_MASK: "0xf"
+    #DPDK_UIO_DRIVER: uio_pci_generic
+    #HUGE_PAGES: 32000
+    #AGENT_MODE: dpdk
+    #HUGE_PAGES_DIR: /dev/hugepages
+    #DPDK_MEM_PER_SOCKET: 1024
+
+  node:
+    host_os: ubuntu
 
 labels:
   vrouter_agent_kernel:
@@ -27,44 +61,6 @@ dependencies:
     daemonset:
     - contrail-config
     - contrail-control
-
-# common section for all vrouter variants
-# this section is commonized with other Contrails' services
-contrail_env:
-  CONTROLLER_NODES: {{controller_nodes|join(',')}}
-{% if control_nodes is defined %}
-  CONTROL_NODES: {{ control_nodes }}
-{% endif %}
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: {{ orchestrator }}
-  AAA_MODE: {{ aaa_mode | default(noauth) }}
-  # this value should be the same as nova/conf.nova.neutron.metadata_proxy_shared_secret
-  #METADATA_PROXY_SECRET: password
-  #CONTROL_DATA_NET_LIST: 8.0.0.0/24
-{% if contrail_configuration.CONTROL_DATA_NET_LIST is defined %}
-  CONTROL_DATA_NET_LIST: {{ contrail_configuration.CONTROL_DATA_NET_LIST }}
-{% endif %}
-{% if contrail_configuration.VROUTER_GATEWAY is defined %}
-  VROUTER_GATEWAY: {{ contrail_configuration.VROUTER_GATEWAY }}
-{% endif %}
-
-# section of vrouter template for kernel mode
-contrail_env_vrouter_kernel:
-{% if contrail_configuration.AGENT_MODE is defined %}
-  AGENT_MODE: {{ contrail_configuration.AGENT_MODE }}
-{% endif %}
-
-# section of vrouter template for dpdk mode
-contrail_env_vrouter_dpdk:
-  #CPU_CORE_MASK: "0xf"
-  #DPDK_UIO_DRIVER: uio_pci_generic
-  #HUGE_PAGES: 32000
-  #AGENT_MODE: dpdk
-  #HUGE_PAGES_DIR: /hugepages
-
-
-node:
-  host_os: ubuntu
 
 # typically overriden by environmental
 # values, but should include all endpoints
@@ -95,6 +91,8 @@ endpoints:
     namespace: openstack
 
 manifests:
-  configmap_env: true
+  configmap_vrouter_kernel: true
+  configmap_vrouter_keystone: true
+  configmap_vrouter_dpdk: false
   daemonset_kernel: true
   daemonset_dpdk: false

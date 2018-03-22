@@ -1,15 +1,22 @@
-images:
-  tags:
-    nodemgr: "{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
-    analytics_api: "{{ contrailregistry }}/contrail-analytics-api:{{ sku }}-{{ version }}"
-    contrail_collector: "{{ contrailregistry }}/contrail-analytics-collector:{{ sku }}-{{ version }}"
-    analytics_alarm_gen: "{{ contrailregistry }}/contrail-analytics-alarm-gen:{{ sku }}-{{ version }}"
-    analytics_query_engine: "{{ contrailregistry }}/contrail-analytics-query-engine:{{ sku }}-{{ version }}"
-    analytics_snmp_collector: "{{ contrailregistry }}/contrail-analytics-snmp-collector:{{ sku }}-{{ version }}"
-    contrail_topology: "{{ contrailregistry }}/contrail-analytics-topology:{{ sku }}-{{ version }}"
-    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
-  imagePullPolicy: "IfNotPresent"
+global:
+  images:
+    tags:
+      nodemgr: "{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
+      analytics_api: "{{ contrailregistry }}/contrail-analytics-api:{{ sku }}-{{ version }}"
+      contrail_collector: "{{ contrailregistry }}/contrail-analytics-collector:{{ sku }}-{{ version }}"
+      analytics_alarm_gen: "{{ contrailregistry }}/contrail-analytics-alarm-gen:{{ sku }}-{{ version }}"
+      analytics_query_engine: "{{ contrailregistry }}/contrail-analytics-query-engine:{{ sku }}-{{ version }}"
+      analytics_snmp_collector: "{{ contrailregistry }}/contrail-analytics-snmp-collector:{{ sku }}-{{ version }}"
+      contrail_topology: "{{ contrailregistry }}/contrail-analytics-topology:{{ sku }}-{{ version }}"
+      dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+    imagePullPolicy: "IfNotPresent"
 
+  contrail_env:
+    CONTROLLER_NODES: {{controller_nodes|join(',')}}
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: {{ orchestrator }}
+    AAA_MODE: {{ aaa_mode | default(noauth) }}
+    
 labels:
   analytics:
     node_selector_key: opencontrail.org/controller
@@ -21,12 +28,6 @@ dependencies:
     daemonset:
     - contrail-analyticsdb
     - contrail-config
-
-contrail_env:
-  CONTROLLER_NODES: {{controller_nodes|join(',')}}
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: {{ orchestrator }}
-  AAA_MODE: {{ aaa_mode | default(noauth) }}
 
 # typically overriden by environmental
 # values, but should include all endpoints
@@ -76,8 +77,10 @@ service:
   analytics_api_public_port: ""
 
 manifests:
-  configmap_env: true
+  configmap_analytics_env: true
+  configmap_analytics_keystone: true
+  configmap_analytics_rabbitmq: true
   daemonset_analytics: true
   service_analytics_api_server: true
   service_analytics_api_ingress: true
-  ingress_analytics_api: trues
+  ingress_analytics_api: true

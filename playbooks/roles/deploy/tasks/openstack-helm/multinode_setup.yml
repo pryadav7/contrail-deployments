@@ -19,10 +19,6 @@
     openstack_helm_branch: "{{ deployment.type.helm.branch }}"
   when: deployment.type.helm.branch is defined
 
-#- name: Clone all repos on slave nodes
-#  hosts: slave_nodes
-#  include: clone_repos.yaml
-
 - name: set openstack helm provision dir
   set_fact:
      openstack_helm_dir: "/opt/openstack-helm"
@@ -36,23 +32,12 @@
     openstackregistry: "{{ deployment.type.helm.registry }}"
   when: deployment.type.helm.registry is defined
 
-- name: clone openstack helm repo
-  git:
-    repo: 'https://github.com/Juniper/openstack-helm.git'
-    accept_hostkey: yes
-    update: yes
-    dest: "/opt/openstack-helm"
-    version: "{{ openstack_helm_branch }}"
-
-- name: clone openstack helm infra repo
-  git:
-    repo: 'https://github.com/Juniper/openstack-helm-infra.git'
-    accept_hostkey: yes
-    update: yes
-    dest: "/opt/openstack-helm-infra"
-    version: "{{ openstack_helm_branch }}"
-
 # Update local-vars.yaml for different version of kubernetes, cni, calico
+
+- name: Update glance values.yaml
+  template:
+    src: "openstack-helm/glance-values.yaml.j2"
+    dest: "{{ openstack_helm_dir }}/glance/values.yaml"
 
 - name: Install opencontrail packages
   command: "./tools/deployment/developer/common/{{ item }}"
@@ -63,6 +48,11 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: update glance values.yaml
+  template:
+    src: "openstack-helm/glance-values.yaml.j2"
+    dest: "{{ openstack_helm_infra_dir }}/glance/values.yaml"
 
 - name: Create an environment file on the master node for the cluster
   template:
@@ -95,6 +85,16 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+
+- name: disable openstack compute labels for controller nodes
+  command: kubectl label node "{{ vars['hostvars'][item.value.ip]['ansible_hostname'] }}" --overwrite openstack-compute-node=disabled
+  when: item.value.roles.compute is undefined
+  with_dict: "{{ instances }}"
+
+- name: disable openstack control labels for compute nodes
+  command: kubectl label node "{{ vars['hostvars'][item.value.ip]['ansible_hostname'] }}" --overwrite openstack-control-plane=disabled
+  when: item.value.roles.control is undefined
+  with_dict: "{{ instances }}"
 
 - name: setup client
   command: "./tools/deployment/multinode/010-setup-client.sh"
@@ -169,7 +169,7 @@
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
 
 - name: deploy horizon chart
-  command: "./tools/deployment/multinode/100-horizon.sh"
+  command: "./tools/deployment/developer/ceph/100-horizon.sh"
   args:
    chdir: "{{ openstack_helm_dir }}"
   environment:

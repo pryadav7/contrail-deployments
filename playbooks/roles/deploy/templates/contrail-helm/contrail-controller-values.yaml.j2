@@ -1,17 +1,28 @@
-images:
-  tags:
-    nodemgr: "{{ contrailregistry }}/contrail-nodemgr:"
-    contrail_control: "{{ contrailregistry }}/contrail-controller-control-control:{{ sku }}-{{ version }}"
-    control_dns: "{{ contrailregistry }}/contrail-controller-control-dns:{{ sku }}-{{ version }}"
-    control_named: "{{ contrailregistry }}/contrail-controller-control-named:{{ sku }}-{{ version }}"
-    config_api: "{{ contrailregistry }}/contrail-controller-config-api:{{ sku }}-{{ version }}"
-    config_devicemgr: "{{ contrailregistry }}/contrail-controller-config-devicemgr:{{ sku }}-{{ version }}"
-    config_schema_transformer: "{{ contrailregistry }}/contrail-controller-config-schema:{{ sku }}-{{ version }}"
-    config_svcmonitor: "{{ contrailregistry }}/contrail-controller-config-svcmonitor:{{ sku }}-{{ version }}"
-    webui_middleware: "{{ contrailregistry }}/contrail-controller-webui-job:{{ sku }}-{{ version }}"
-    webui: "{{ contrailregistry }}/contrail-controller-webui-web:{{ sku }}-{{ version }}"
-    dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
-  imagePullPolicy: "IfNotPresent"
+global:
+  images:
+    tags:
+      nodemgr: "{{ contrailregistry }}/contrail-nodemgr:{{ sku }}-{{ version }}"
+      contrail_control: "{{ contrailregistry }}/contrail-controller-control-control:{{ sku }}-{{ version }}"
+      control_dns: "{{ contrailregistry }}/contrail-controller-control-dns:{{ sku }}-{{ version }}"
+      control_named: "{{ contrailregistry }}/contrail-controller-control-named:{{ sku }}-{{ version }}"
+      config_api: "{{ contrailregistry }}/contrail-controller-config-api:{{ sku }}-{{ version }}"
+      config_devicemgr: "{{ contrailregistry }}/contrail-controller-config-devicemgr:{{ sku }}-{{ version }}"
+      config_schema_transformer: "{{ contrailregistry }}/contrail-controller-config-schema:{{ sku }}-{{ version }}"
+      config_svcmonitor: "{{ contrailregistry }}/contrail-controller-config-svcmonitor:{{ sku }}-{{ version }}"
+      webui_middleware: "{{ contrailregistry }}/contrail-controller-webui-job:{{ sku }}-{{ version }}"
+      webui: "{{ contrailregistry }}/contrail-controller-webui-web:{{ sku }}-{{ version }}"
+      dep_check: quay.io/stackanetes/kubernetes-entrypoint:v0.2.1
+    imagePullPolicy: "IfNotPresent"
+
+  contrail_env:
+    CONTROLLER_NODES: {{controller_nodes|join(',')}}
+{% if control_nodes is defined %}
+    CONTROL_NODES: {{ control_nodes }}
+{% endif %}
+    LOG_LEVEL: SYS_NOTICE
+    CLOUD_ORCHESTRATOR: {{ orchestrator }}
+    AAA_MODE: {{ aaa_mode | default(noauth) }}
+    BGP_PORT: 1179
 
 labels:
   control:
@@ -39,15 +50,6 @@ dependencies:
     - contrail-config
     - contrail-redis
 
-contrail_env:
-  CONTROLLER_NODES: {{controller_nodes|join(',')}} 
-{% if control_nodes is defined %}
-  CONTROL_NODES: {{ control_nodes }}
-{% endif %}
-  LOG_LEVEL: SYS_NOTICE
-  CLOUD_ORCHESTRATOR: {{ orchestrator }}
-  AAA_MODE: {{ aaa_mode | default(noauth) }}
-  BGP_PORT: 1179
 
 # typically overriden by environmental
 # values, but should include all endpoints
@@ -103,16 +105,84 @@ endpoints:
       default: 'http'
     port:
       metadata:
-        default: 8775
         public: 80
     namespace: openstack
+  nova:
+    name: nova
+    hosts:
+      default: nova-api
+      public: nova
+    host_fqdn_override:
+      default: null
+    path:
+      default: "/v2/%(tenant_id)s"
+    scheme:
+      default: 'http'
+    port:
+      api:
+        default: 8774
+        public: 80
+      novncproxy:
+        default: 6080
+    namespace: openstack
+  network:
+    name: neutron
+    hosts:
+      default: neutron-server
+      public: neutron
+    host_fqdn_override:
+      default: null
+    path:
+      default: null
+    scheme:
+      default: 'http'
+    port:
+      api:
+        default: 9696
+        public: 80
+    namespace: openstack
+  image:
+    name: glance
+    hosts:
+      default: glance-api
+      public: glance
+    host_fqdn_override:
+      default: null
+    path:
+      default: null
+    scheme:
+      default: http
+    port:
+      api:
+        default: 9292
+        public: 80
+    namespace: openstack
+  volume:
+    name: cinder
+    hosts:
+      default: cinder-api
+      public: cinder
+    host_fqdn_override:
+      default: null
+    path:
+      default: '/v1/%(tenant_id)s'
+    scheme:
+      default:  'http'
+    port:
+      api:
+        default: 8776
+        public: 80
+    namespace: openstack
+
 
 # Service related inputs are defined here
 service:
   config_api_public_port: ""
 
 manifests:
-  configmap_env: true
+  configmap_controller_env: true
+  configmap_controller_keystone: true
+  configmap_controller_rabbitmq: true
   daemonset_config: true
   daemonset_control: true
   daemonset_control_only: false

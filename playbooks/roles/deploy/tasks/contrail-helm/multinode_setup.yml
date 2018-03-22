@@ -35,19 +35,15 @@
     aaa_mode: "{{ contrail_configuration.AAA_MODE }}"
   when: contrail_configuration.AAA_MODE is defined
 
-- name: clone contrail helm deployer repo
-  git:
-    repo: 'https://github.com/Juniper/contrail-helm-deployer.git'
-    accept_hostkey: yes
-    update: yes
-    dest: "/opt/contrail-helm-deployer"
-    version: "{{ contrail_branch }}"
+- name: set labels for controller nodes
+  command: kubectl label node "{{ vars['hostvars'][item.value.ip]['ansible_hostname'] }}" opencontrail.org/controller=enabled
+  when: item.value.roles.openstack is defined
+  with_dict: "{{ instances }}"
 
-#- name: label nodes based on the roles  , needs to be updated for multinode
-#  command: "{{ item }}"
-#  with_items:
-#     - kubectl label node opencontrail.org/controller=enabled --all
-#     - kubectl label node opencontrail.org/vrouter-kernel=enabled --all
+- name: set labels for vrouter nodes
+  command: kubectl label node "{{ vars['hostvars'][item.value.ip]['ansible_hostname'] }}" opencontrail.org/vrouter-kernel=enabled
+  when: item.value.roles.vrouter is defined
+  with_dict: "{{ instances }}"
 
 - name: check if cluster admin file exists
   stat: path="{{ contrail_helm_provision_dir }}/rbac/cluster-admin.yaml"

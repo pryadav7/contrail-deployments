@@ -37,7 +37,7 @@
 
 - name: set labels for controller nodes
   command: kubectl label node "{{ vars['hostvars'][item.value.ip]['ansible_hostname'] }}" opencontrail.org/controller=enabled
-  when: item.value.roles.openstack is defined
+  when: item.value.roles.control is defined
   with_dict: "{{ instances }}"
 
 - name: set labels for vrouter nodes

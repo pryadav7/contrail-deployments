@@ -83,12 +83,12 @@
 
 - name: disable openstack compute labels for controller nodes
   command: kubectl label node "{{ vars['hostvars'][item.value.ip]['ansible_hostname'] }}" --overwrite openstack-compute-node=disabled
-  when: item.value.roles.compute is undefined
+  when: item.value.roles.vrouter is undefined
   with_dict: "{{ instances }}"
 
 - name: disable openstack control labels for compute nodes
   command: kubectl label node "{{ vars['hostvars'][item.value.ip]['ansible_hostname'] }}" --overwrite openstack-control-plane=disabled
-  when: item.value.roles.control is undefined
+  when: item.value.roles.openstack is undefined
   with_dict: "{{ instances }}"
 
 - name: setup client
@@ -211,4 +211,4 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
-  when: aaa_mode == "rbac"
+  when: aaa_mode == 'rbac'

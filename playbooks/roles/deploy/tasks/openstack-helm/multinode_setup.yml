@@ -209,3 +209,11 @@
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
   ignore_errors: yes
 
+- name: deploy neutron rbac chart
+  command: "./tools/deployment/multinode/142-neutron-rbac-opencontrail.sh"
+  args:
+   chdir: "{{ openstack_helm_dir }}"
+  environment:
+   OSH_PATH: "{{ openstack_helm_dir }}"
+   OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+  when: aaa_mode == "rbac"

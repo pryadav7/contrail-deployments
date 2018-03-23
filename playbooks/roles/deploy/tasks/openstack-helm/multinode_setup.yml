@@ -49,11 +49,6 @@
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
 
-- name: update glance values.yaml
-  template:
-    src: "openstack-helm/glance-values.yaml.j2"
-    dest: "{{ openstack_helm_infra_dir }}/glance/values.yaml"
-
 - name: Create an environment file on the master node for the cluster
   template:
     src: "openstack-helm/multinode-inventory.yaml.j2"

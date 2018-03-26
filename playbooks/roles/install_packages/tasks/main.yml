@@ -18,14 +18,6 @@
     deployment: "{{ deployment|default({})|combine({'type': types }) }}"
   when: deployment is undefined or deployment.type is undefined
 
-- name: install packages for kolla ansible deployer
-  include: contrail-kolla-ansible/main.yml
-  when: deployment.type.kolla is defined
-
-- name: install packages for contrail ansible deployer
-  include: contrail-ansible-deployer/main.yml
-  when: deployment.type.contrail and deployment.type.kolla is defined
-
 - name: install packages for contrail helm deployer
   include: contrail-helm/main.yml
   when: deployment.type.helm is defined

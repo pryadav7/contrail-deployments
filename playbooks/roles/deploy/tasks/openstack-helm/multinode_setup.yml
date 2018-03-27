@@ -154,6 +154,7 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+   OPENSTACK_VERSION: "{{ sku }}"
 
 - name: deploy ceph-radosgateway chart
   command: "./tools/deployment/multinode/090-ceph-radosgateway.sh"
@@ -162,6 +163,7 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+   OPENSTACK_VERSION: "{{ sku }}"
 
 - name: deploy horizon chart
   command: "./tools/deployment/developer/ceph/100-horizon.sh"
@@ -170,6 +172,7 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+   OPENSTACK_VERSION: "{{ sku }}"
 
 - name: deploy glance chart
   command: "./tools/deployment/multinode/100-glance.sh"
@@ -178,6 +181,7 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+   OPENSTACK_VERSION: "{{ sku }}"
 
 - name: deploy cinder chart
   command: "./tools/deployment/multinode/110-cinder.sh"
@@ -186,6 +190,7 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+   OPENSTACK_VERSION: "{{ sku }}"
 
 - name: deploy libvert chart
   command: "./tools/deployment/multinode/131-libvirt-opencontrail.sh"
@@ -194,6 +199,7 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+   OPENSTACK_VERSION: "{{ sku }}"
 
 - name: deploy compute-kit chart
   command: "./tools/deployment/multinode/141-compute-kit-opencontrail.sh"
@@ -202,6 +208,8 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
+   OSH_EXTRA_HELM_ARGS_NOVA: "--set images.tags.opencontrail_compute_init={{ openstackregistry }}/contrail-openstack-compute-init:{{ version }}"
+   OSH_EXTRA_HELM_ARGS_NEUTRON: "--set images.tags.opencontrail_neutron_init={{ openstackregistry }}/contrail-openstack-neutron-init:{{ version }}"
   ignore_errors: yes
 
 - name: deploy neutron rbac chart
@@ -211,4 +219,5 @@
   environment:
    OSH_PATH: "{{ openstack_helm_dir }}"
    OSH_INFRA_PATH: "{{ openstack_helm_infra_dir }}"
-  when: aaa_mode == 'rbac'
+   OPENSTACK_VERSION: "{{ sku }}"
+  when: contrail_configuration.AAA_MODE is defined and contrail_configuration.AAA_MODE == "rbac"

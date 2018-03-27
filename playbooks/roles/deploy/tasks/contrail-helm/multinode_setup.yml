@@ -94,3 +94,5 @@
   command: "./tools/deployment/multinode/151-heat-opencontrail.sh"
   args:
     chdir: "/opt/openstack-helm"
+  environment:
+    OSH_EXTRA_HELM_ARGS_HEAT: "--set images.tags.opencontrail_heat_init={{ contrailregistry }}/contrail-openstack-heat-init:{{ version }}"

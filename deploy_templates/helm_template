@@ -1,0 +1,103 @@
+
+deployment:
+  type:
+    contrail:
+      branch: master
+      registry: docker.io/opencontrailnightly
+    helm:
+      branch: master
+      registry: docker.io/opencontrailnightly
+  sku: ocata
+  os: ubuntu
+  version: latest
+  orchestrator: openstack
+
+provider_config:
+  bms:
+    ssh_pwd: c0ntrail123
+    ssh_user: root
+    ntpserver: 10.84.5.100
+    domainsuffix: local
+
+instances:
+  server4:
+    provider: bms
+    ip: 10.0.0.7
+    roles:
+      vrouter:
+  server5:
+    provider: bms
+    ip: 10.0.0.8
+    roles:
+      vrouter:
+  server6:
+    provider: bms
+    ip: 10.0.0.9
+    roles:
+      vrouter:
+  server1:
+    provider: bms
+    ip: 10.0.0.4
+    roles:
+      openstack:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+  server2:
+    provider: bms
+    ip: 10.0.0.5
+    roles:
+      openstack:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+  server3:
+    provider: bms
+    ip: 10.0.0.6
+    roles:
+      openstack:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+
+contrail_configuration:
+  VROUTER_GATEWAY: 10.10.0.1
+  CONTROL_DATA_NET_LIST: 10.10.0.0/24
+  BGP_PORT: 1179
+  AGENT_MODE: nic
+  CONTROL_NODES: 10.10.0.4
+  PHYSICAL_INTERFACE: ens4
+  AAA_MODE: rbac
+
+orchestrator_configuration:
+  keystone:
+    version: v3
+    password: password
+
+test_configuration:
+  image_web_server: 10.84.5.120
+  auth_url: http://keystone.openstack.svc.cluster.local:80/v3
+  auth_port: 80
+  use_project_scoped_token: True
+  web_server:
+    server: zephyrine.englab.juniper.net
+    username: stack
+    password: stack@123
+    report_path: /var/www/html/sanity/fb-sanity/FB-master-ocata-ubuntu16-ha-helm-sanity
+    log_path: /var/www/html/Docs/logs
+    web_root: /Docs/logs
+  mail_server:
+    server: 10.84.24.64
+    port: 4000
+    tp: dl-contrail-sw@juniper.net
+    sender: contrail-build@juniper.net
+

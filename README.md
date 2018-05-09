@@ -6,6 +6,7 @@ Contrail Ansible Deployment
 Steps for Contrail Deployemnt using contrail ansible deployer
 
 1. Install required packages on config node 
+(Replace $config_node_ip with config node IP address)
 
 sshpass -p c0ntrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$config_node_ip 'yum install -y git ansible epel-release vim' 
 
@@ -39,6 +40,7 @@ sshpass (Ubuntu 16.04)
 Steps for Contrail Deployemnt using Helm
 
 1. Install required packages on config node 
+(Replace $config_node_ip with config node IP address)
 
 sshpass -p c0ntrail123 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$config_node_ip 'apt-get clean && apt-get update && apt-get install -y software-properties-common && apt-add-repository -y ppa:ansible/ansible && apt-get update && apt-get install -y sshpass git python-pip python-minimal python-apt && pip install ansible'
  

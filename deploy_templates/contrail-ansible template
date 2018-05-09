@@ -1,0 +1,116 @@
+deployment:
+  type:
+    kolla:
+      branch: contrail/ocata
+      registry: ci-repo.englab.juniper.net:5000
+    contrail:
+      branch: R5.0
+      registry: ci-repo.englab.juniper.net:5000
+  sku: ocata
+  os: centos74
+  version: ocata-5.0-49
+  orchestrator: openstack
+
+provider_config:
+  bms:
+    ssh_pwd: c0ntrail123
+    ssh_user: root
+    ntpserver: 10.84.5.100
+    domainsuffix: local
+
+instances:
+  server8:
+    provider: bms
+    ip: 10.0.0.11
+    roles:
+      vrouter:
+      openstack_compute:
+  server9:
+    provider: bms
+    ip: 10.0.0.12
+    roles:
+      vrouter:
+      openstack_compute:
+  server4:
+    provider: bms
+    ip: 10.0.0.7
+    roles:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+  server5:
+    provider: bms
+    ip: 10.0.0.8
+    roles:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+  server6:
+    provider: bms
+    ip: 10.0.0.9
+    roles:
+      config_database:
+      config:
+      control:
+      analytics_database:
+      analytics:
+      webui:
+  server7:
+    provider: bms
+    ip: 10.0.0.10
+    roles:
+      vrouter:
+      openstack_compute:
+  server1:
+    provider: bms
+    ip: 10.0.0.4
+    roles:
+      openstack:
+  server2:
+    provider: bms
+    ip: 10.0.0.5
+    roles:
+      openstack:
+  server3:
+    provider: bms
+    ip: 10.0.0.6
+    roles:
+      openstack:
+
+contrail_configuration:
+  two_interface: true
+  AAA_MODE: rbac
+  VROUTER_GATEWAY: 10.10.0.1
+  PHYSICAL_INTERFACE: eth1
+  CONTROL_DATA_NET_LIST: 10.10.0.0/24
+  CONTROLLER_NODES: 10.10.0.7,10.10.0.8,10.10.0.9
+
+orchestrator_configuration:
+  keystone:
+    version: v3
+    password: c0ntrail123
+  internal_vip: 10.10.0.100
+  external_vip: 10.0.0.100
+  network_interface: eth1
+
+test_configuration:
+  image_web_server: 10.84.5.120
+  use_project_scoped_token: True
+  web_server:
+    server: zephyrine.englab.juniper.net
+    username: stack
+    password: stack@123
+    report_path: /var/www/html/sanity/fb-sanity/FB-master-ocata-centos7-ha-ansible-sanity
+    log_path: /var/www/html/Docs/logs
+    web_root: /Docs/logs
+  mail_server:
+    server: 10.84.24.64
+    port: 4000
+    tp: dl-contrail-sw@juniper.net
+    sender: contrail-build@juniper.net

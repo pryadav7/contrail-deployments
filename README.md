@@ -8,6 +8,7 @@ Ansible 2.4.3.0
 sshpass (Ubuntu 16.04)
 
 Steps for Contrail Deployemnt using Helm
+
 Clone contrail-tools repo on the config node
 
 Update all.yaml 

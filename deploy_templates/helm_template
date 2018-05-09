@@ -1,15 +1,11 @@
-
 deployment:
   type:
-    contrail:
-      branch: master
-      registry: docker.io/opencontrailnightly
     helm:
-      branch: master
-      registry: docker.io/opencontrailnightly
+      branch: R5.0
+      registry: ci-repo.englab.juniper.net:5000
   sku: ocata
   os: ubuntu
-  version: latest
+  version: ocata-5.0-53
   orchestrator: openstack
 
 provider_config:
@@ -20,22 +16,22 @@ provider_config:
     domainsuffix: local
 
 instances:
-  server4:
+  server4-ad3857e968462e18601ad0e3d3d7e4e5:
     provider: bms
     ip: 10.0.0.7
     roles:
       vrouter:
-  server5:
+  server5-ad3857e968462e18601ad0e3d3d7e4e5:
     provider: bms
     ip: 10.0.0.8
     roles:
       vrouter:
-  server6:
+  server6-ad3857e968462e18601ad0e3d3d7e4e5:
     provider: bms
     ip: 10.0.0.9
     roles:
       vrouter:
-  server1:
+  server1-ad3857e968462e18601ad0e3d3d7e4e5:
     provider: bms
     ip: 10.0.0.4
     roles:
@@ -46,7 +42,7 @@ instances:
       analytics_database:
       analytics:
       webui:
-  server2:
+  server2-ad3857e968462e18601ad0e3d3d7e4e5:
     provider: bms
     ip: 10.0.0.5
     roles:
@@ -57,7 +53,7 @@ instances:
       analytics_database:
       analytics:
       webui:
-  server3:
+  server3-ad3857e968462e18601ad0e3d3d7e4e5:
     provider: bms
     ip: 10.0.0.6
     roles:
@@ -73,9 +69,10 @@ contrail_configuration:
   VROUTER_GATEWAY: 10.10.0.1
   CONTROL_DATA_NET_LIST: 10.10.0.0/24
   BGP_PORT: 1179
-  AGENT_MODE: nic
-  CONTROL_NODES: 10.10.0.4
+  CONTROLLER_NODES: 10.10.0.4,10.10.0.5,10.10.0.6
+  CONTROL_NODES: 10.10.0.4,10.10.0.5,10.10.0.6
   PHYSICAL_INTERFACE: ens4
+  AGENT_MODE: nic
   AAA_MODE: rbac
 
 orchestrator_configuration:
@@ -100,4 +97,3 @@ test_configuration:
     port: 4000
     tp: dl-contrail-sw@juniper.net
     sender: contrail-build@juniper.net
-

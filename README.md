@@ -1,3 +1,24 @@
+# Fabric Provisioning
+
+clone contrail-deployments repository
+1. Install contrail command 
+   cd contrail-deployments/fabric_cluster_provisioning
+   Run install_contrail_command.sh script providing contrail-command IP and version
+   
+   Eg: ./install_contrail_command.sh 10.87.118.172 5.0-154
+   
+2. Provision the cluster
+   Update template_contrail_fabric_cluster_sanity.json with the server details and contrail networking configuration
+   Run provision.sh script 
+   
+   Script takes care of adding the adding the servers, triggers provisioning and providing the status.
+
+   Msg after provisioning completes:
+   
+   CREATED
+   Provisioning completed successfully via contrail command .. 
+   
+
 # contrail-deployments
 
 

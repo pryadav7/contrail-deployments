@@ -129,6 +129,7 @@ def build_combined_dict_for_provision():
         list_openstack_nodes = []
         list_controller_nodes = []
         list_control_nodes = []
+        list_service_nodes = []
         for ser in server_dict:
                 if "openstack" in server_dict[ser]["roles"]:
                         if "control_data_interface" in server_dict[ser]:
@@ -137,6 +138,9 @@ def build_combined_dict_for_provision():
                         list_controller_nodes.append(server_dict[ser]["management_ip"])
                         if "control_data_interface" in server_dict[ser]:
                                 list_control_nodes.append(server_dict[ser]["control_data_interface"]["control_data_ip"])
+                if "service" in server_dict[ser]["roles"]:
+                        if "control_data_interface" in server_dict[ser]:
+                                list_service_nodes.append(server_dict[ser]["control_data_interface"]["control_data_ip"])
         temp_openstack = {}
         temp_openstack["key"] = "OPENSTACK_NODES"
         temp_openstack["value"] = ",".join(list_openstack_nodes)
@@ -150,9 +154,14 @@ def build_combined_dict_for_provision():
                 temp_control["key"] = "CONTROL_NODES"
                 temp_control["value"] = ",".join(list_control_nodes)
                 temp["data"]["contrail_configuration"]["key_value_pair"].append(temp_control)
+                temp_service = {}
+                temp_service["key"] = "TSN_NODES"
+                temp_service["value"] = ",".join(list_service_nodes)
+                temp["data"]["contrail_configuration"]["key_value_pair"].append(temp_service)
         temp["data"]["OPENSTACK_NODES"] = ",".join(list_openstack_nodes)
         temp["data"]["CONTROLLER_NODES"] = ",".join(list_controller_nodes)
         temp["data"]["CONTROL_NODES"] = ",".join(list_control_nodes)
+        temp["data"]["TSN_NODES"] = ",".join(list_service_nodes)
         fq_name_list = []
         fq_name_list.append("default-global-system-config")
         fq_name_list.append(cluster_details_dict["cluster_name"] + '-' + str(uuid.uuid4()))

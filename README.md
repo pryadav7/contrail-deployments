@@ -9,6 +9,7 @@ clone contrail-deployments repository
    
 2. Provision the cluster
    Update template_contrail_fabric_cluster_sanity.json with the server details and contrail networking configuration
+   
    Run provision.sh script 
    
    Script takes care of adding the adding the servers, triggers provisioning and providing the status.

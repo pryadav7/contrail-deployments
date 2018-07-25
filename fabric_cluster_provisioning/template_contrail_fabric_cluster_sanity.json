@@ -1,0 +1,119 @@
+{
+	"params":{
+		"servers":{
+			"server1":{
+				"name": "server1",
+				"management_ip": "10.87.118.188",
+				"management_interface": "eth0",
+				"server_uuid": "ce240137-8663-4999-85e4-02a4e533a787",
+				"control_data_interface": {
+					"control_data_interface" : "eth1",
+					"control_data_ip" : "10.10.0.4"
+				},
+                                "default_gateway" : "",
+				"roles": ["openstack"]
+			},
+			"server2":{
+                                "name": "server2",
+                                "management_ip": "10.87.118.183",
+                                "management_interface": "eth0",
+                                "server_uuid": "ce240137-8663-4999-85e4-02a4e533a878",
+                                "control_data_interface": {
+                                        "control_data_interface" : "eth1",
+                                        "control_data_ip" : "10.10.0.5"
+                                },
+                                "default_gateway" : "",
+                                "roles" : ["config_database", "config", "control", "analytics_database", "analytics", "webui"]
+                        },
+                        "server3":{
+                                "name": "server3",
+                                "management_ip": "10.87.118.186",
+                                "management_interface": "eth0",
+                                "server_uuid": "ce240137-8663-4999-85e4-02a4e533a979",
+                                "control_data_interface": {
+                                        "control_data_interface" : "eth1",
+                                        "control_data_ip" : "10.10.0.6"
+                                },
+                                "default_gateway" : "",
+                                "roles" : ["config_database", "config", "control", "analytics_database", "analytics", "webui"]
+                        },
+                        "server4":{
+                                "name": "server4",
+                                "management_ip": "10.87.118.168",
+                                "management_interface": "eth0",
+                                "server_uuid": "ce240137-8663-4999-85e4-02a4e533a171",
+                                "control_data_interface": {
+                                        "control_data_interface" : "eth1",
+                                        "control_data_ip" : "10.10.0.7"
+                                },
+                                "default_gateway" : "",
+                                "roles" : ["config_database", "config", "control", "analytics_database", "analytics", "webui"]
+                        },
+                        "server5":{
+                                "name": "server5",
+                                "management_ip": "10.87.118.182",
+                                "management_interface": "eth0",
+                                "server_uuid": "ce240137-8663-4999-85e4-02a4e533a272",
+                                "control_data_interface": {
+                                        "control_data_interface" : "eth1",
+                                        "control_data_ip" : "10.10.0.8"
+                                },
+                                "default_gateway" : "",
+                                "roles": ["compute"]
+                        },
+                        "server6":{
+                                "name": "server6",
+                                "management_ip": "10.87.118.176",
+                                "management_interface": "eth0",
+                                "server_uuid": "ce240137-8663-4999-85e4-02a4e533a373",
+                                "control_data_interface": {
+                                        "control_data_interface" : "eth1",
+                                        "control_data_ip" : "10.10.0.9"
+                                },
+                                "default_gateway" : "",
+                                "roles": ["service"]
+                        },
+                        "server8":{
+                                "name": "server8",
+                                "management_ip": "10.87.118.163",
+                                "management_interface": "eth0",
+                                "server_uuid": "ce240137-8663-4999-85e4-02a4e533a474",
+                                "control_data_interface": {
+                                        "control_data_interface" : "eth1",
+                                        "control_data_ip" : "10.10.0.10"
+                                },
+                                "default_gateway" : "10.10.0.1",
+                                "roles": ["service"]
+                        }
+		},
+		"go_server_details": {
+			"server_ip": "10.87.118.172",
+			"server_port": "9091"
+		},
+		"contrail_cluster_details": {
+			"cluster_uuid": "4ad37316-182b-49fc-8322-075b0e8a0219",
+			"cluster_name" : "contrail_test_cluster",
+			"provision_type" : "ansible",
+			"ntp_server" : "10.84.5.100",
+                        "domain_suffix" : "local",
+			"encap_priority": "VXLAN,MPLSoUDP,MPLSoGRE", 
+			"registry_private_insecure" : true,
+			"container_registry" : "10.84.5.81:5000",
+			"contrail_version" : "ocata-5.0-94",
+			"high_availability" : true,
+			"orchestrator" : "openstack",
+			"default_gateway" : "10.10.0.1"
+		},
+		"openstack_cluster_details": {
+			"cluster_name" : "openstack_test_cluster",
+                        "kolla_globals" : {
+                                        "enable_haproxy" : "yes",
+                                        "enable_ironic" : "yes",
+                                        "enable_swift" : "yes",
+                                        "keepalived_virtual_router_id" : "60"
+                         },
+                        "openstack_internal_vip": "10.10.0.132",
+			"openstack_external_vip": "10.87.118.132"
+ 		}
+	}
+}

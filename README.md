@@ -2,7 +2,9 @@
 
 clone contrail-deployments repository
 1. Install contrail command 
+   
    cd contrail-deployments/fabric_cluster_provisioning
+   
    Run install_contrail_command.sh script providing contrail-command IP and version
    
    Eg: ./install_contrail_command.sh 10.87.118.172 5.0-154

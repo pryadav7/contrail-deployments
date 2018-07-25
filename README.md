@@ -10,6 +10,7 @@ clone contrail-deployments repository
    Eg: ./install_contrail_command.sh 10.87.118.172 5.0-154
    
 2. Provision the cluster
+   
    Update template_contrail_fabric_cluster_sanity.json with the server details and contrail networking configuration
    
    Run provision.sh script 
@@ -19,6 +20,7 @@ clone contrail-deployments repository
    Msg after provisioning completes:
    
    CREATED
+   
    Provisioning completed successfully via contrail command .. 
    
 

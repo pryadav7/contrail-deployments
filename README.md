@@ -23,6 +23,8 @@ clone contrail-deployments repository
    
    Provisioning completed successfully via contrail command .. 
    
+   Note: No need to update the UUID's
+   
 
 # contrail-deployments
 

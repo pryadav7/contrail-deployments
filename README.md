@@ -1,4 +1,4 @@
-# Fabric Provisioning
+# Cluster Provisioning
 
 clone contrail-deployments repository
 1. Install contrail command 

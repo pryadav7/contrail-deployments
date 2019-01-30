@@ -41,6 +41,7 @@ def build_data_for_api_to_add_servers():
                 temp_dict_server_data["fq_name"] = []
                 temp_dict_server_data["fq_name"].append("default-global-system-config")
                 temp_dict_server_data["fq_name"].append(na_me + '-' + server_dict[ser]["server_uuid"])
+                temp_dict_server_data["parent_type"] = "global-system-config"
 		temp_dict_server["data"] = temp_dict_server_data
 		resources_dict["resources"].append(temp_dict_server)
 		# Management Management Interface Information
@@ -467,7 +468,7 @@ def add_servers(final_token):
         server_data=str(build_data_for_api_to_add_servers())
         a = subprocess.Popen(["curl %s -H 'Accept: */*' --compressed -H 'Connection: keep-alive' -H 'Content-Type: application/json' -H 'X-Requested-With: XMLHttpRequest' -H 'X-Auth-Token: %s' --data '%s' --insecure --include " % (url,final_token, server_data)], stdout=subprocess.PIPE, shell=True).communicate()
         add_server_response = str(a)
-        if "201 Created" in add_server_response:
+        if "200 OK" in add_server_response:
             print "Passed"
         else:
             print "Failed to add servers ..\n",add_server_response
@@ -480,7 +481,7 @@ def start_ansible_provisioning(final_token):
        prov_dict=str(build_combined_dict_for_provision())
        a = subprocess.Popen(["curl %s -H 'Accept: */*' --compressed -H 'Connection: keep-alive' -H 'Content-Type: application/json' -H 'X-Requested-With: XMLHttpRequest' -H 'X-Auth-Token: %s' --data '%s' --insecure --include " % (url,final_token, prov_dict)], stdout=subprocess.PIPE, shell=True).communicate()
        prov_response = str(a)
-       if "201 Created" in prov_response:
+       if "200 OK" in prov_response:
            print "Passed"
        else:
            print "Failed to start provisioning via contrail command ..\n",prov_response

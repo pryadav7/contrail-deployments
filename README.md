@@ -7,7 +7,7 @@ clone contrail-deployments repository
    
    Run install_contrail_command.sh script providing contrail-command IP and version
    
-   Eg: ./install_contrail_command.sh 10.87.118.172 5.0-154
+   Eg: ./install_contrail_command.sh 10.87.118.172 master-494
    
 2. Provision the cluster
    
